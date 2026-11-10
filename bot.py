@@ -1,17 +1,25 @@
 import os
+import random
+import string
 import requests
 from pyrogram import Client, filters
 from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery
-from database import set_user_vip_tier, check_user_tier
+from database import set_user_vip_tier, save_vip_key, check_user_tier
 
 API_ID = int(os.getenv("API_ID", "1234567"))
 API_HASH = os.getenv("API_HASH", "your_api_hash")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "your_bot_token")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "@your_channel")
+LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-100123456789"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://your-backend.koyeb.app")
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/movies")
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+def generate_key(tier: str) -> str:
+    prefix = tier[:3].upper()
+    random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f"HKM-{prefix}-{random_str}"
 
 @app.on_message(filters.chat(CHANNEL_ID) & (filters.video | filters.document))
 def auto_sync_movie(client, message):
@@ -32,9 +40,8 @@ def auto_sync_movie(client, message):
             "streamUrl": direct_stream_url
         }
         requests.post(BACKEND_API_URL, json=payload)
-        print(f"[HKM BOT] Auto-synced: {clean_title}")
     except Exception as e:
-        print(f"[HKM BOT ERROR] Sync failed: {e}")
+        print(f"Sync Error: {e}")
 
 @app.on_message(filters.command("start"))
 async def start_cmd(client, message: Message):
@@ -52,11 +59,7 @@ async def start_cmd(client, message: Message):
             return
 
     user_info = await check_user_tier(message.from_user.id)
-    await message.reply_text(f"🎬 **Welcome to HKM Providers!**\nYour Status: **{user_info['tier'].upper()}**\n\nUse /premium to check plans.")
-
-@app.on_message(filters.command("premium"))
-async def premium_cmd(client, message: Message):
-    await message.reply_text("Choose a plan directly on our website or reply with your desired tier.")
+    await message.reply_text(f"🎬 **Welcome to HKM Providers!**\nYour Status: **{user_info['tier'].upper()}**\n\nChoose a plan on our website to get started.")
 
 async def send_plan_invoice(message: Message, title: str, payload_type: str, price: int):
     await app.send_invoice(
@@ -77,13 +80,35 @@ async def checkout_handler(client, query: PreCheckoutQuery):
 @app.on_message(filters.successful_payment)
 async def payment_success(client, message: Message):
     payload = message.successful_payment.invoice_payload
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name
+    
     tier = "free"
     if "basic" in payload: tier = "basic"
     elif "standard" in payload: tier = "standard"
     elif "diamond" in payload: tier = "diamond"
 
-    expiry = await set_user_vip_tier(message.from_user.id, tier, duration_days=30)
-    await message.reply_text(f"🎉 Payment Successful! Your **{tier.upper()}** plan is active until {expiry.strftime('%Y-%m-%d')}.")
+    vip_key = generate_key(tier)
+    await save_vip_key(vip_key, tier, user_id)
+    expiry = await set_user_vip_tier(user_id, tier, duration_days=30)
+
+    await message.reply_text(
+        f"🎉 **Payment Successful!**\n\n"
+        f"Your Plan: **{tier.upper()}**\n"
+        f"🔑 Your VIP Access Key: `{vip_key}`\n\n"
+        f"Paste this key into the **Activate Key** button on the website to unlock your session instantly!"
+    )
+
+    try:
+        log_text = (
+            f"🔔 **New Premium Subscription!**\n\n"
+            f"👤 User: @{username} (ID: `{user_id}`)\n"
+            f"💎 Tier: **{tier.upper()}**\n"
+            f"🔑 Generated Key: `{vip_key}`"
+        )
+        await client.send_message(chat_id=LOG_CHANNEL_ID, text=log_text)
+    except Exception as e:
+        print(f"Log Error: {e}")
 
 print("HKM Python Bot Engine running...")
 app.run()
