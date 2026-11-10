@@ -25,7 +25,10 @@
         <span class="text-xl font-extrabold tracking-wider text-white uppercase">HKM <span class="text-red-500">PROVIDERS</span></span>
       </div>
       <div class="flex items-center gap-3">
-        <button onclick="toggleModal('adminModal')" class="bg-slate-800/80 hover:bg-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-700/50 transition flex items-center gap-2">
+        <button onclick="openActivateModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 px-3.5 py-2 rounded-xl text-xs font-bold border border-amber-500/30 transition flex items-center gap-1.5 shadow-md">
+          <i class="fa-solid fa-key"></i>Activate Key
+        </button>
+        <button onclick="toggleModal('adminModal')" class="bg-slate-800/80 hover:bg-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-700/50 transition hidden sm:flex items-center gap-2">
           <i class="fa-solid fa-plus text-red-500"></i>Add Movie
         </button>
         <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:opacity-95 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/20 transition flex items-center gap-1.5">
@@ -93,6 +96,24 @@
         <i class="fa-solid fa-bolt mr-2"></i>Download Now
       </a>
       <button onclick="closeGateway()" class="mt-4 text-xs text-slate-500 hover:text-slate-300 transition">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Key Activation Modal -->
+  <div id="activateModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
+      <div class="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-key"></i>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Activate VIP Access Key</h3>
+      <p class="text-slate-400 text-sm mb-6">Enter the unique key provided by our Telegram bot after payment.</p>
+      
+      <input type="text" id="vipKeyInput" placeholder="e.g. HKM-STA-A9X2K1" class="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-center text-sm font-mono tracking-wider text-amber-400 uppercase mb-4 focus:outline-none focus:border-amber-500 transition">
+      
+      <button onclick="submitVipKey()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition">
+        Verify & Unlock Plan
+      </button>
+      <button onclick="toggleModal('activateModal')" class="mt-4 text-xs text-slate-500 hover:text-slate-300 transition">Cancel</button>
     </div>
   </div>
 
@@ -202,8 +223,8 @@
     const SHORTLINK_API_KEY = "YOUR_SHORTENER_API_TOKEN";
     const SHORTLINK_BASE_URL = "https://exe.io/api?api=" + SHORTLINK_API_KEY + "&url=";
 
-    // Set user tier ('free', 'basic', 'standard', or 'diamond')
-    let currentUserTier = 'free'; 
+    // Load active tier from browser memory or default to 'free'
+    let currentUserTier = localStorage.getItem('hkm_user_tier') || 'free'; 
     let moviesData = [], currentFilter = 'all';
     let currentSlide = 0, slideInterval;
 
@@ -352,8 +373,12 @@
         await fetch(`${API_BASE}/movies/${id}/view`, { method: 'POST' });
       } catch (e) {}
 
-      if (isPremium && (currentUserTier === 'basic' || currentUserTier === 'free')) {
-        alert("Premium movies require Standard or Diamond VIP plans.");
+      if (isPremium && currentUserTier === 'basic') {
+        alert("Premium movies are unavailable on your Basic Plan. Upgrade to Standard or Diamond.");
+        openPremiumModal();
+        return;
+      }
+      if (isPremium && currentUserTier === 'free') {
         openPremiumModal();
         return;
       }
@@ -398,6 +423,35 @@
           dlBtn.classList.remove('hidden');
         }
       }, 1000);
+    }
+
+    function openActivateModal() { document.getElementById('activateModal').classList.remove('hidden'); }
+
+    async function submitVipKey() {
+      const keyVal = document.getElementById('vipKeyInput').value.trim();
+      if (!keyVal) { alert("Please enter a valid key."); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/user/redeem-key`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyVal })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentUserTier = data.tier;
+          localStorage.setItem('hkm_user_tier', data.tier);
+          alert(`🎉 Success! Your browser session is now upgraded to ${data.tier.toUpperCase()} VIP.`);
+          toggleModal('activateModal');
+          applyUserPermissions();
+          loadMovies();
+        } else {
+          alert("❌ Error: " + data.message);
+        }
+      } catch (err) {
+        alert("Connection error while redeeming key.");
+      }
     }
 
     function closeGateway() { document.getElementById('gatewayModal').classList.add('hidden'); }
