@@ -6,6 +6,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/hkmdb")
 client = AsyncIOMotorClient(MONGO_URI)
 db = client.hkmdb
 users_collection = db.users
+keys_collection = db.vip_keys
 
 async def set_user_vip_tier(telegram_id: int, tier: str, duration_days: int = 30):
     expiry_date = datetime.utcnow() + timedelta(days=duration_days)
@@ -18,12 +19,22 @@ async def set_user_vip_tier(telegram_id: int, tier: str, duration_days: int = 30
                 "telegramId": telegram_id,
                 "tier": tier,
                 "isVIP": is_vip,
-                "vipExpiry": expiry_date
+                "vipExpiry": expiry_date,
+                "updatedAt": datetime.utcnow()
             }
         },
         upsert=True
     )
     return expiry_date
+
+async def save_vip_key(key: str, tier: str, telegram_id: int):
+    await keys_collection.insert_one({
+        "key": key,
+        "tier": tier,
+        "telegramId": telegram_id,
+        "isRedeemed": False,
+        "createdAt": datetime.utcnow()
+    })
 
 async def check_user_tier(telegram_id: int) -> dict:
     user = await users_collection.find_one({"telegramId": telegram_id})
@@ -33,4 +44,4 @@ async def check_user_tier(telegram_id: int) -> dict:
         await users_collection.update_one({"telegramId": telegram_id}, {"$set": {"tier": "free", "isVIP": False}})
         return {"tier": "free", "isVIP": False}
     return {"tier": user.get("tier", "free"), "isVIP": user.get("isVIP", False)}
-  
+    
