@@ -14,6 +14,14 @@ mongoose.connect(MONGO_URI)
 
 const db = mongoose.connection;
 
+const episodeSchema = new mongoose.Schema({
+  season: { type: Number, default: 1 },
+  episode: { type: Number, required: true },
+  title: { type: String, default: '' },
+  streamUrl: { type: String, required: true },
+  downloadUrl: { type: String, required: true }
+});
+
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   posterUrl: { type: String, default: 'https://via.placeholder.com/300x450?text=HKM+Providers' },
@@ -21,9 +29,9 @@ const movieSchema = new mongoose.Schema({
   quality: { type: String, default: '1080p' },
   isPremium: { type: Boolean, default: false },
   views: { type: Number, default: 0 },
-  tgMessageId: { type: Number },
-  tgFileId: { type: String },
-  streamUrl: { type: String, required: true },
+  streamUrl: { type: String, default: '' },
+  downloadUrl: { type: String, default: '' },
+  episodes: [episodeSchema],
   createdAt: { type: Date, default: Date.now }
 });
 const Movie = mongoose.model('Movie', movieSchema);
@@ -46,10 +54,56 @@ app.post('/api/movies/:id/view', async (req, res) => {
   }
 });
 
+// Supports both standalone Movies and Episode-wise Series/Anime
 app.post('/api/movies', async (req, res) => {
   try {
-    const { title, posterUrl, category, quality, isPremium, tgMessageId, tgFileId, streamUrl } = req.body;
-    const newMovie = new Movie({ title, posterUrl, category, quality, isPremium, tgMessageId, tgFileId, streamUrl });
+    const { title, posterUrl, category, quality, isPremium, streamUrl, downloadUrl, season, episode, episodeTitle } = req.body;
+    const isEpisodic = ['series', 'anime'].includes((category || '').toLowerCase()) || episode !== undefined;
+
+    if (isEpisodic && episode !== undefined) {
+      const epObj = {
+        season: Number(season) || 1,
+        episode: Number(episode),
+        title: episodeTitle || `Episode ${episode}`,
+        streamUrl,
+        downloadUrl
+      };
+
+      // Check if Series/Anime already exists (case-insensitive)
+      let existingShow = await Movie.findOne({ title: { $regex: new RegExp(`^${title.trim()}$`, 'i') } });
+
+      if (existingShow) {
+        // Replace existing episode if same season & episode, otherwise push
+        const idx = existingShow.episodes.findIndex(e => e.season === epObj.season && e.episode === epObj.episode);
+        if (idx > -1) {
+          existingShow.episodes[idx] = epObj;
+        } else {
+          existingShow.episodes.push(epObj);
+        }
+        existingShow.episodes.sort((a, b) => (a.season - b.season) || (a.episode - b.episode));
+        if (posterUrl && !posterUrl.includes('unsplash.com/photo-1536440136628')) {
+          existingShow.posterUrl = posterUrl;
+        }
+        await existingShow.save();
+        return res.status(200).json({ success: true, movie: existingShow });
+      } else {
+        const newShow = new Movie({
+          title: title.trim(),
+          posterUrl,
+          category: category || 'Series',
+          quality,
+          isPremium,
+          streamUrl,
+          downloadUrl,
+          episodes: [epObj]
+        });
+        await newShow.save();
+        return res.status(201).json({ success: true, movie: newShow });
+      }
+    }
+
+    // Standard single Movie
+    const newMovie = new Movie({ title: title.trim(), posterUrl, category, quality, isPremium, streamUrl, downloadUrl });
     await newMovie.save();
     res.status(201).json({ success: true, movie: newMovie });
   } catch (err) {
@@ -61,15 +115,12 @@ app.get('/api/download/:id', async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send('Movie not found');
-    res.setHeader('Content-Disposition', `attachment; filename="${movie.title}.mp4"`);
-    res.setHeader('Content-Type', 'video/mp4');
-    res.redirect(movie.streamUrl);
+    res.redirect(movie.downloadUrl);
   } catch (err) {
     res.status(500).send('Download error');
   }
 });
 
-// VIP Key Redemption Endpoint
 app.post('/api/user/redeem-key', async (req, res) => {
   try {
     const { key } = req.body;
