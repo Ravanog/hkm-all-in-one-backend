@@ -7,10 +7,10 @@ from pyrogram import Client, filters
 from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
-API_ID = int(os.getenv("API_ID", "1234567"))
-API_HASH = os.getenv("API_HASH", "your_api_hash")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "your_bot_token")
-CHANNEL_ID = os.getenv("CHANNEL_ID", "@your_channel")
+API_ID = int(os.getenv("API_ID", "25380424"))
+API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_LkA")
+CHANNEL_ID = os.getenv("CHANNEL_ID", "-1002082701021")
 LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-100123456789"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://your-backend.koyeb.app")
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/movies")
