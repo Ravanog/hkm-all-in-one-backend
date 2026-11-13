@@ -38,22 +38,18 @@
       </div>
 
       <div class="flex items-center gap-2.5 sm:gap-3">
-        <!-- Theme Switcher -->
         <button onclick="toggleTheme()" title="Switch Theme" class="bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl border border-amber-400/40 dark:border-amber-500/30 transition flex items-center justify-center">
           <i id="themeIcon" class="fa-solid fa-moon text-base"></i>
         </button>
 
-        <!-- Activate Key -->
         <button onclick="openActivateModal()" class="bg-amber-500/10 dark:bg-slate-800 hover:bg-amber-500/20 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 px-3.5 py-2 rounded-xl text-xs font-bold border border-amber-500/30 transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-key"></i><span class="hidden xs:inline">Activate Key</span>
+          <i class="fa-solid fa-key"></i><span class="hidden sm:inline">Activate Key</span>
         </button>
 
-        <!-- Add Movie -->
-        <button onclick="toggleModal('adminModal')" class="bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700/50 transition hidden sm:flex items-center gap-2">
-          <i class="fa-solid fa-plus text-amber-500"></i>Add Movie
+        <button onclick="toggleModal('adminModal')" class="bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700/50 transition flex items-center gap-2">
+          <i class="fa-solid fa-plus text-amber-500"></i><span class="hidden sm:inline">Add Content</span>
         </button>
 
-        <!-- Take Premium -->
         <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:opacity-95 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/25 transition flex items-center gap-1.5">
           <i class="fa-solid fa-crown"></i><span id="premiumBtnText">TAKE PREMIUM</span>
         </button>
@@ -77,7 +73,7 @@
     <div id="top5Grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
   </section>
 
-  <!-- Banner Ad Container (Hidden for Paid Tiers) -->
+  <!-- Banner Ad Container -->
   <div id="bannerAdContainer" class="max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8">
     <div class="p-6 bg-amber-100/60 dark:bg-slate-900/60 border border-dashed border-amber-300 dark:border-slate-800 rounded-2xl text-center text-xs tracking-wide">
       <p class="font-medium text-slate-500 dark:text-slate-400">[ MONETIZATION AD SPACE - MONETAG / ADSTERRA ]</p>
@@ -105,7 +101,28 @@
     <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
   </main>
 
-  <!-- Action Choice Modal (Stream vs Download) -->
+  <!-- Series / Anime Episode Selector Modal -->
+  <div id="episodeModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-slate-900 border border-amber-300 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <span id="epModalBadge" class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Series</span>
+          <h3 id="epModalTitle" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1.5">Show Title</h3>
+        </div>
+        <button onclick="toggleModal('episodeModal')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Season Selector Pills -->
+      <div id="seasonTabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-3 border-b border-slate-200/70 dark:border-slate-800/70"></div>
+
+      <!-- Episodes List -->
+      <div id="episodesList" class="overflow-y-auto space-y-2.5 py-4 pr-1 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- Action Choice Modal (Single Movie Stream vs Download) -->
   <div id="actionModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-8 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
       <h3 id="actionModalTitle" class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Choose Action</h3>
@@ -179,7 +196,6 @@
       <p class="text-slate-500 dark:text-slate-400 text-sm mb-7">Affordable plans in Indian Rupees (₹). Instant activation via Telegram.</p>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-7">
-        <!-- Basic ₹49 -->
         <div class="bg-amber-50/70 dark:bg-slate-950 border border-amber-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
           <div>
             <h4 class="font-bold text-base text-slate-800 dark:text-slate-200">Basic</h4>
@@ -194,7 +210,6 @@
           <button onclick="selectPlan('buy_basic')" class="mt-7 w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">Select Basic (₹49)</button>
         </div>
 
-        <!-- Standard ₹99 -->
         <div class="bg-amber-50 dark:bg-slate-950 border-2 border-amber-500 p-6 rounded-2xl flex flex-col justify-between text-left relative shadow-xl shadow-amber-500/10">
           <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">Most Popular</span>
           <div>
@@ -209,7 +224,6 @@
           <button onclick="selectPlan('buy_standard')" class="mt-7 w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:opacity-95 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg shadow-amber-500/20">Select Standard (₹99)</button>
         </div>
 
-        <!-- Diamond ₹299 -->
         <div class="bg-amber-50/70 dark:bg-slate-950 border border-amber-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
           <div>
             <h4 class="font-bold text-base text-purple-600 dark:text-purple-400">Diamond</h4>
@@ -227,30 +241,57 @@
     </div>
   </div>
 
-  <!-- Manual Upload Modal -->
-  <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-8 rounded-3xl max-w-lg w-full shadow-2xl">
-      <h2 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Add Content to HKM</h2>
+  <!-- Manual Upload Modal (Supports Movie OR Episode-wise Series/Anime) -->
+  <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl my-8">
+      <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Add Movie / Series / Anime</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">For Series or Anime, enter the exact show title to group episodes together.</p>
+      
       <form onsubmit="submitManualMovie(event)" class="space-y-3">
-        <input type="text" id="mTitle" placeholder="Movie Title" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        <input type="url" id="mPoster" placeholder="Poster Image URL" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Content Type</label>
+            <select id="mCategory" onchange="toggleEpisodeFields()" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
+              <option value="Action">Movie (Action/Drama)</option>
+              <option value="Series">Series (Episode-wise)</option>
+              <option value="Anime">Anime (Episode-wise)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Access Level</label>
+            <select id="mPremium" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
+              <option value="false">Free</option>
+              <option value="true">VIP Only</option>
+            </select>
+          </div>
+        </div>
+
+        <input type="text" id="mTitle" placeholder="Movie or Series/Anime Title" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+        
+        <!-- Episode-specific fields (Shown when Series or Anime is selected) -->
+        <div id="episodeFields" class="hidden grid grid-cols-3 gap-3 bg-amber-500/5 border border-amber-500/20 p-3 rounded-2xl">
+          <div>
+            <label class="block text-[10px] font-bold text-amber-500 mb-1">Season</label>
+            <input type="number" id="mSeason" value="1" min="1" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-amber-500 mb-1">Episode #</label>
+            <input type="number" id="mEpisode" value="1" min="1" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-amber-500 mb-1">Ep. Name (Opt)</label>
+            <input type="text" id="mEpisodeTitle" placeholder="Pilot" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
+          </div>
+        </div>
+
+        <input type="url" id="mPoster" placeholder="Poster Image URL (https://...)" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
         <input type="url" id="mStream" placeholder="Stream URL (Direct video / Embed)" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
         <input type="url" id="mDownload" placeholder="Download File URL" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        <div class="grid grid-cols-2 gap-4">
-          <select id="mCategory" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
-            <option value="Action">Action</option>
-            <option value="Series">Series</option>
-            <option value="Anime">Anime</option>
-          </select>
-          <select id="mPremium" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
-            <option value="false">Free</option>
-            <option value="true">VIP Only</option>
-          </select>
-        </div>
         <input type="text" id="mQuality" placeholder="Quality (4K / 1080p)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+        
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" onclick="toggleModal('adminModal')" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-amber-500/20">Save Movie</button>
+          <button type="submit" class="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-amber-500/20">Save Content</button>
         </div>
       </form>
     </div>
@@ -265,8 +306,8 @@
     let currentUserTier = localStorage.getItem('hkm_user_tier') || 'free'; 
     let moviesData = [], currentFilter = 'all';
     let currentSlide = 0, slideInterval;
+    let activeShow = null, activeSeason = 1;
 
-    // Theme Switcher
     function toggleTheme() {
       const htmlEl = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
@@ -286,11 +327,42 @@
       document.getElementById('themeIcon').className = "fa-solid fa-sun text-base";
     }
 
+    function toggleEpisodeFields() {
+      const cat = document.getElementById('mCategory').value;
+      const epBox = document.getElementById('episodeFields');
+      if (cat === 'Series' || cat === 'Anime') {
+        epBox.classList.remove('hidden');
+      } else {
+        epBox.classList.add('hidden');
+      }
+    }
+
     const demoMovies = [
-      { _id: '1', title: 'Inception', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600', backdropUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200', category: 'Action', quality: '4K UHD', views: 42500, isPremium: false, streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/1' },
-      { _id: '2', title: 'Stranger Things S4', posterUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600', backdropUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1200', category: 'Series', quality: '1080p', views: 98100, isPremium: true, streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/2' },
-      { _id: '3', title: 'Attack on Titan Final', posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600', backdropUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200', category: 'Anime', quality: '4K', views: 76400, isPremium: true, streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/3' },
-      { _id: '4', title: 'Interstellar', posterUrl: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=600', backdropUrl: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1200', category: 'Action', quality: '4K HDR', views: 61200, isPremium: false, streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/4' }
+      {
+        _id: '1', title: 'Inception', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600',
+        backdropUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200',
+        category: 'Action', quality: '4K UHD', views: 42500, isPremium: false,
+        streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/1', episodes: []
+      },
+      {
+        _id: '2', title: 'Stranger Things', posterUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600',
+        backdropUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1200',
+        category: 'Series', quality: '1080p', views: 98100, isPremium: true,
+        episodes: [
+          { season: 1, episode: 1, title: 'The Vanishing of Will Byers', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s1e1' },
+          { season: 1, episode: 2, title: 'The Weirdo on Maple Street', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s1e2' },
+          { season: 2, episode: 1, title: 'MADMAX', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s2e1' }
+        ]
+      },
+      {
+        _id: '3', title: 'Attack on Titan', posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600',
+        backdropUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200',
+        category: 'Anime', quality: '4K', views: 76400, isPremium: false,
+        episodes: [
+          { season: 1, episode: 1, title: 'To You, in 2000 Years', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/aot-e1' },
+          { season: 1, episode: 2, title: 'That Day', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/aot-e2' }
+        ]
+      }
     ];
 
     function applyUserPermissions() {
@@ -325,8 +397,8 @@
           <div class="absolute bottom-8 left-8 right-8 max-w-xl">
             <span class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">${m.category} • ${m.quality}</span>
             <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">${m.title}</h2>
-            <button onclick="openActionModal('${m._id}', '${m.title.replace(/'/g, "\\'")}', ${m.isPremium}, '${m.streamUrl}', '${m.downloadUrl}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-xl font-extrabold text-xs flex items-center gap-2 shadow-lg transition">
-              <i class="fa-solid fa-play"></i> Watch / Download
+            <button onclick="openItem('${m._id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-xl font-extrabold text-xs flex items-center gap-2 shadow-lg transition">
+              <i class="fa-solid fa-play"></i> ${m.episodes && m.episodes.length > 0 ? 'Browse Episodes' : 'Watch / Download'}
             </button>
           </div>
         </div>
@@ -344,7 +416,7 @@
       const sorted = [...moviesData].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
       
       top5Container.innerHTML = sorted.map((m, index) => `
-        <div onclick="openActionModal('${m._id}', '${m.title.replace(/'/g, "\\'")}', ${m.isPremium}, '${m.streamUrl}', '${m.downloadUrl}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer shadow-sm">
+        <div onclick="openItem('${m._id}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer shadow-sm">
           <div class="aspect-[2/3] overflow-hidden relative">
             <img src="${m.posterUrl}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
             <div class="absolute top-2 left-2 w-8 h-8 rounded-xl bg-slate-900/90 flex items-center justify-center font-extrabold text-sm text-amber-400 shadow-lg">
@@ -393,21 +465,26 @@
       document.getElementById('movieCount').innerText = `${filtered.length} Items`;
 
       filtered.forEach(m => {
+        const hasEpisodes = m.episodes && m.episodes.length > 0;
+        const badgeText = hasEpisodes ? `${m.episodes.length} Eps` : m.quality;
+
         grid.innerHTML += `
-          <div onclick="openActionModal('${m._id}', '${m.title.replace(/'/g, "\\'")}', ${m.isPremium}, '${m.streamUrl}', '${m.downloadUrl}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer flex flex-col justify-between shadow-sm">
+          <div onclick="openItem('${m._id}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer flex flex-col justify-between shadow-sm">
             <div class="aspect-[2/3] overflow-hidden relative">
               <img src="${m.posterUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 bg-slate-950/40">
-                <span class="bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg">Stream / Download</span>
+                <span class="bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg">
+                  ${hasEpisodes ? 'Select Episode' : 'Stream / Download'}
+                </span>
               </div>
               ${m.isPremium ? '<span class="absolute top-3 left-3 bg-amber-500 text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-full shadow"><i class="fa-solid fa-crown mr-1"></i>VIP</span>' : ''}
-              <span class="absolute top-3 right-3 bg-slate-900/80 text-slate-200 text-[10px] font-bold px-2.5 py-1 rounded">${m.quality}</span>
+              <span class="absolute top-3 right-3 bg-slate-900/85 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded">${badgeText}</span>
             </div>
             <div class="p-4">
               <h3 class="font-bold text-sm truncate text-slate-900 dark:text-slate-100">${m.title}</h3>
               <div class="flex items-center justify-between mt-2 text-xs">
                 <span class="text-slate-500 dark:text-slate-400"><i class="fa-solid fa-eye text-amber-500 mr-1"></i>${formatViews(m.views)}</span>
-                <span class="text-amber-600 dark:text-amber-500 font-semibold">Select &rarr;</span>
+                <span class="text-amber-600 dark:text-amber-500 font-semibold">${hasEpisodes ? 'Episodes' : 'Select'} &rarr;</span>
               </div>
             </div>
           </div>
@@ -415,19 +492,117 @@
       });
     }
 
-    async function openActionModal(id, title, isPremium, streamUrl, downloadUrl) {
+    // Master handler when clicking a Movie, Series, or Anime card
+    async function openItem(id) {
+      const item = moviesData.find(m => m._id === id);
+      if (!item) return;
+
       try {
         await fetch(`${API_BASE}/movies/${id}/view`, { method: 'POST' });
       } catch (e) {}
 
-      // Block VIP movies for Free and Basic users
-      if (isPremium && (currentUserTier === 'free' || currentUserTier === 'basic')) {
-        alert("🔒 VIP movies require a Standard (₹99) or Diamond (₹299) plan.");
+      // Check VIP lock
+      if (item.isPremium && (currentUserTier === 'free' || currentUserTier === 'basic')) {
+        alert("🔒 VIP content requires a Standard (₹99) or Diamond (₹299) plan.");
         openPremiumModal();
         return;
       }
 
-      // Basic Plan: Stream ONLY (No Download Option)
+      // If Series/Anime with Episodes -> Open Episode Selector Modal
+      if (item.episodes && item.episodes.length > 0) {
+        openEpisodeModal(item);
+        return;
+      }
+
+      // Otherwise handle as standalone Movie
+      openSingleActionModal(item.title, item.streamUrl, item.downloadUrl);
+    }
+
+    // Render Season Tabs & Episode List
+    function openEpisodeModal(show) {
+      activeShow = show;
+      document.getElementById('epModalBadge').innerText = show.category;
+      document.getElementById('epModalTitle').innerText = show.title;
+
+      const seasons = [...new Set(show.episodes.map(e => e.season || 1))].sort((a, b) => a - b);
+      activeSeason = seasons[0] || 1;
+
+      renderSeasonTabs(seasons);
+      renderEpisodesList();
+      document.getElementById('episodeModal').classList.remove('hidden');
+    }
+
+    function renderSeasonTabs(seasons) {
+      const tabBox = document.getElementById('seasonTabs');
+      tabBox.innerHTML = seasons.map(s => `
+        <button onclick="switchSeason(${s})" class="px-4 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${s === activeSeason ? 'bg-amber-500 text-slate-950 shadow' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}">
+          Season ${s}
+        </button>
+      `).join('');
+    }
+
+    function switchSeason(seasonNum) {
+      activeSeason = seasonNum;
+      const seasons = [...new Set(activeShow.episodes.map(e => e.season || 1))].sort((a, b) => a - b);
+      renderSeasonTabs(seasons);
+      renderEpisodesList();
+    }
+
+    function renderEpisodesList() {
+      const listBox = document.getElementById('episodesList');
+      const eps = activeShow.episodes
+        .filter(e => (e.season || 1) === activeSeason)
+        .sort((a, b) => a.episode - b.episode);
+
+      listBox.innerHTML = eps.map(ep => {
+        const fullEpTitle = `${activeShow.title} - S${activeSeason}E${ep.episode}`;
+        const safeTitle = fullEpTitle.replace(/'/g, "\\'");
+        const downloadAllowed = currentUserTier !== 'basic';
+
+        return `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-950 border border-amber-200/80 dark:border-slate-800">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs flex items-center justify-center shrink-0">
+                E${ep.episode}
+              </span>
+              <div class="truncate">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">${ep.title || 'Episode ' + ep.episode}</p>
+                <p class="text-[10px] text-slate-500">Season ${activeSeason} • Episode ${ep.episode}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="startEpisodeStream('${safeTitle}', '${ep.streamUrl}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-[11px] flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-play"></i> Stream
+              </button>
+              ${downloadAllowed ? `
+                <button onclick="startEpisodeDownload('${safeTitle}', '${ep.downloadUrl}')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1.5 transition">
+                  <i class="fa-solid fa-download"></i> Download
+                </button>
+              ` : `
+                <span class="px-2.5 py-2 bg-slate-200 dark:bg-slate-800/60 text-slate-400 rounded-xl text-[10px] font-semibold">
+                  <i class="fa-solid fa-lock mr-1"></i>Stream Only
+                </span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function startEpisodeStream(title, streamUrl) {
+      toggleModal('episodeModal');
+      handleStreamClick(title, streamUrl);
+    }
+
+    function startEpisodeDownload(title, downloadUrl) {
+      toggleModal('episodeModal');
+      document.getElementById('targetMovieTitle').innerText = title;
+      handleDownloadClick(downloadUrl);
+    }
+
+    // Single Movie Action Modal
+    function openSingleActionModal(title, streamUrl, downloadUrl) {
       if (currentUserTier === 'basic') {
         document.getElementById('basicPlanNotice').classList.remove('hidden');
         document.getElementById('streamMovieTitle').innerText = `Streaming: ${title}`;
@@ -439,7 +614,6 @@
       document.getElementById('basicPlanNotice').classList.add('hidden');
       document.getElementById('actionModalTitle').innerText = title;
 
-      // Update labels based on user tier
       document.getElementById('streamBtnLabel').innerText = currentUserTier === 'free'
         ? "Stream Online (1 Ad Click)"
         : "Stream Online (Ad-Free VIP)";
@@ -448,23 +622,33 @@
         ? "Direct Download (No Shortlink)"
         : "Download File (Shortlink)";
 
-      document.getElementById('streamChoiceBtn').onclick = () => handleStreamClick(title, streamUrl);
-      document.getElementById('downloadChoiceBtn').onclick = () => handleDownloadClick(id, downloadUrl);
+      document.getElementById('streamChoiceBtn').onclick = () => {
+        toggleModal('actionModal');
+        handleStreamClick(title, streamUrl);
+      };
+      document.getElementById('downloadChoiceBtn').onclick = () => {
+        toggleModal('actionModal');
+        document.getElementById('targetMovieTitle').innerText = title;
+        handleDownloadClick(downloadUrl);
+      };
       document.getElementById('actionModal').classList.remove('hidden');
     }
 
     function handleStreamClick(title, streamUrl) {
-      toggleModal('actionModal');
       if (currentUserTier === 'free') {
         window.open(MONETAG_AD_URL, '_blank');
+      }
+      if (currentUserTier === 'basic') {
+        document.getElementById('basicPlanNotice').classList.remove('hidden');
+      } else {
+        document.getElementById('basicPlanNotice').classList.add('hidden');
       }
       document.getElementById('streamMovieTitle').innerText = `Streaming: ${title}`;
       document.getElementById('videoPlayer').src = streamUrl;
       document.getElementById('streamModal').classList.remove('hidden');
     }
 
-    function handleDownloadClick(id, downloadUrl) {
-      toggleModal('actionModal');
+    function handleDownloadClick(downloadUrl) {
       document.getElementById('gatewayModal').classList.remove('hidden');
       document.getElementById('finalDownloadBtn').classList.add('hidden');
       document.getElementById('timerBox').classList.remove('hidden');
@@ -544,18 +728,27 @@
 
     async function submitManualMovie(e) {
       e.preventDefault();
+      const category = document.getElementById('mCategory').value;
+      const bodyData = {
+        title: document.getElementById('mTitle').value,
+        posterUrl: document.getElementById('mPoster').value,
+        streamUrl: document.getElementById('mStream').value,
+        downloadUrl: document.getElementById('mDownload').value,
+        category: category,
+        quality: document.getElementById('mQuality').value || '1080p',
+        isPremium: document.getElementById('mPremium').value === 'true'
+      };
+
+      if (category === 'Series' || category === 'Anime') {
+        bodyData.season = Number(document.getElementById('mSeason').value) || 1;
+        bodyData.episode = Number(document.getElementById('mEpisode').value) || 1;
+        bodyData.episodeTitle = document.getElementById('mEpisodeTitle').value || `Episode ${bodyData.episode}`;
+      }
+
       await fetch(`${API_BASE}/movies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: document.getElementById('mTitle').value,
-          posterUrl: document.getElementById('mPoster').value,
-          streamUrl: document.getElementById('mStream').value,
-          downloadUrl: document.getElementById('mDownload').value,
-          category: document.getElementById('mCategory').value,
-          quality: document.getElementById('mQuality').value || '1080p',
-          isPremium: document.getElementById('mPremium').value === 'true'
-        })
+        body: JSON.stringify(bodyData)
       });
       toggleModal('adminModal');
       loadMovies();
