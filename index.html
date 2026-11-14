@@ -63,7 +63,8 @@
         <div><p class="font-bold text-xs text-slate-900 dark:text-white">Request Content</p><p class="text-[10px] text-slate-500">Ask for movies, series or anime</p></div>
       </button>
 
-      <button onclick="toggleModal('adminModal'); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
+      <!-- Admin-Only Add Content Button (Hidden by default) -->
+      <button id="adminMenuBtn" onclick="toggleModal('adminModal'); toggleMenuDrawer();" class="hidden flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
         <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-plus"></i></div>
         <div><p class="font-bold text-xs text-slate-900 dark:text-white">Add Content</p><p class="text-[10px] text-slate-500">Upload movie or series episode</p></div>
       </button>
@@ -187,7 +188,7 @@
     </div>
   </div>
 
-  <!-- Manual Upload Modal (adminModal with Language, Quality Lists & Credits) -->
+  <!-- Manual Upload Modal (Admin Only) -->
   <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl my-8">
       <div class="flex items-center justify-between mb-1">
@@ -329,13 +330,33 @@
 
   <script>
     const API_BASE = "https://your-koyeb-backend-url.koyeb.app/api";
-    const SHORTLINK_BASE_URL = "https://arolinks.com/api?api=45b6928d65d1c1dfc2d52d052d879b9b02dd7fe3&url=";
     const MONETAG_AD_URL = "https://your-monetag-ad-link.com";
 
     let currentUserTier = localStorage.getItem('hkm_user_tier') || 'free'; 
     let moviesData = [], currentFilter = 'all';
     let currentSlide = 0, slideInterval;
     let activeShow = null, activeSeason = 1;
+
+    // Check admin status on page load to reveal/hide Add Content button
+    function checkAdminSession() {
+      const isAdmin = localStorage.getItem('hkm_admin_auth') === 'true';
+      const adminBtn = document.getElementById('adminMenuBtn');
+      if (isAdmin && adminBtn) {
+        adminBtn.classList.remove('hidden');
+      }
+    }
+
+    // Run in console via adminLogin() to unlock content addition
+    function adminLogin() {
+      const password = prompt("Enter Admin Password:");
+      if (password === "HKMAdmin123") { // Change this to your secure password
+        localStorage.setItem('hkm_admin_auth', 'true');
+        checkAdminSession();
+        alert("Admin access granted! 'Add Content' is now visible in your menu.");
+      } else {
+        alert("Incorrect password.");
+      }
+    }
 
     function toggleMenuDrawer() {
       const drawer = document.getElementById('menuDrawer');
@@ -347,16 +368,13 @@
 
     function toggleTheme() {
       const htmlEl = document.documentElement;
-      const themeIcon = document.getElementById('themeIcon');
       const drawerThemeIcon = document.getElementById('drawerThemeIcon');
       if (htmlEl.classList.contains('dark')) {
         htmlEl.classList.remove('dark');
-        if(themeIcon) themeIcon.className = "fa-solid fa-sun text-base";
         if(drawerThemeIcon) drawerThemeIcon.className = "fa-solid fa-sun";
         localStorage.setItem('hkm_theme', 'light');
       } else {
         htmlEl.classList.add('dark');
-        if(themeIcon) themeIcon.className = "fa-solid fa-moon text-base";
         if(drawerThemeIcon) drawerThemeIcon.className = "fa-solid fa-moon";
         localStorage.setItem('hkm_theme', 'dark');
       }
@@ -380,6 +398,7 @@
         const res = await fetch(`${API_BASE}/movies`);
         moviesData = await res.json();
       } catch (e) { moviesData = []; }
+      checkAdminSession();
       renderBannerSlideshow();
       renderTop5();
       renderMovies(currentFilter);
@@ -544,7 +563,6 @@
 
     function closeStreamModal() { document.getElementById('streamModal').classList.add('hidden'); document.getElementById('videoPlayer').src = ''; }
     function closeGateway() { document.getElementById('gatewayModal').classList.add('hidden'); }
-    function openActivateModal() { toggleModal('activateModal'); }
     function openPremiumModal() { toggleModal('premiumModal'); }
     function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
 
