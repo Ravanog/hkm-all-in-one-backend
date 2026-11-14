@@ -7,20 +7,6 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
-# Compatibility classes and wrappers for robust Pyrogram execution
-class LabeledPrice:
-    def __init__(self, label: str, amount: int):
-        self.label = label
-        self.amount = amount
-
-class PreCheckoutQuery:
-    def __init__(self, id: str, from_user, currency: str, total_amount: int, payload: str):
-        self.id = id
-        self.from_user = from_user
-        self.currency = currency
-        self.total_amount = total_amount
-        self.payload = payload
-
 API_ID = int(os.getenv("API_ID", "25380424"))
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_LkA")
@@ -32,15 +18,6 @@ WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.ver
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-
-if not hasattr(app, 'on_pre_checkout_query'):
-    def custom_on_pre_checkout_query():
-        def decorator(func):
-            return func
-        return decorator
-    app.on_pre_checkout_query = custom_on_pre_checkout_query
-
-successful_payment_filter = filters.create(lambda _, __, msg: bool(msg.successful_payment))
 
 def generate_key(tier: str) -> str:
     prefix = tier[:3].upper()
@@ -160,19 +137,49 @@ async def index_channel_files(client, message: Message):
     except Exception as e:
         await status_msg.edit_text(f"❌ **Index Error:** `{e}`")
 
+@app.on_message(filters.command("delete") & filters.private)
+async def delete_movie_cmd(client, message: Message):
+    args = message.command
+    if len(args) < 2:
+        await message.reply_text("❌ **Usage:** `/delete <Movie Title or ID>`")
+        return
+
+    query = " ".join(args[1:]).strip()
+    try:
+        res = requests.get(BACKEND_API_URL, timeout=10)
+        if res.status_code != 200:
+            await message.reply_text("❌ Failed to fetch movie list from backend.")
+            return
+
+        movies = res.json()
+        target_movie = None
+
+        for m in movies:
+            if m["_id"] == query or m["title"].lower() == query.lower():
+                target_movie = m
+                break
+
+        if not target_movie:
+            await message.reply_text(f"❌ No matching movie found for: `{query}`")
+            return
+
+        delete_res = requests.delete(f"{BACKEND_API_URL}/{target_movie['_id']}", timeout=10)
+        if delete_res.status_code == 200:
+            await message.reply_text(f"✅ **Successfully deleted movie and poster:** {target_movie['title']}")
+        else:
+            await message.reply_text("❌ Failed to delete movie from database.")
+    except Exception as e:
+        await message.reply_text(f"❌ **Error:** `{e}`")
+
 @app.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message: Message):
     args = message.command
     if len(args) > 1:
         param = args[1]
-        if param == "buy_basic":
-            await send_plan_invoice(message, "Basic VIP Plan (₹49)", "basic", 49)
-            return
-        elif param == "buy_standard":
-            await send_plan_invoice(message, "Standard VIP Plan (₹99)", "standard", 99)
-            return
-        elif param == "buy_diamond":
-            await send_plan_invoice(message, "Diamond VIP Plan (₹299/yr)", "diamond", 299)
+        if param in ["buy_basic", "buy_standard", "buy_diamond"]:
+            tier_name = param.replace("buy_", "").upper()
+            price = 49 if param == "buy_basic" else (99 if param == "buy_standard" else 299)
+            await send_plan_invoice(message.chat.id, f"{tier_name} VIP Plan", param.replace("buy_", ""), price)
             return
 
     user_info = await check_user_tier(message.from_user.id)
@@ -191,60 +198,51 @@ async def start_cmd(client, message: Message):
 
     await message.reply_text(welcome_text, reply_markup=keyboard)
 
-async def send_plan_invoice(message: Message, title: str, payload_type: str, price: int):
-    await app.send_invoice(
-        chat_id=message.chat.id,
-        title=title,
-        description=f"HKM Providers {title}",
-        payload=f"hkm_{payload_type}_30",
-        provider_token="",
-        currency="XTR",
-        prices=[LabeledPrice(title, price)],
-        start_parameter=payload_type
-    )
+async def send_plan_invoice(chat_id: int, title: str, payload_type: str, price: int):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendInvoice"
+    payload = {
+        "chat_id": chat_id,
+        "title": title,
+        "description": f"HKM Providers {title} Subscription",
+        "payload": f"hkm_{payload_type}_30",
+        "currency": "XTR",
+        "prices": [{"label": title, "amount": price}]
+    }
+    requests.post(url, json=payload)
 
-@app.on_pre_checkout_query()
-async def checkout_handler(client, query):
-    try:
-        if hasattr(query, 'answer'):
-            await query.answer(ok=True)
-        else:
-            await client.answer_pre_checkout_query(query.id, ok=True)
-    except Exception as e:
-        print(f"Checkout Error: {e}")
+@app.on_message()
+async def catch_all_messages(client, message: Message):
+    if message.successful_payment:
+        payload = message.successful_payment.invoice_payload
+        user_id = message.from_user.id
+        username = message.from_user.username or message.from_user.first_name
+        
+        tier = "free"
+        if "basic" in payload: tier = "basic"
+        elif "standard" in payload: tier = "standard"
+        elif "diamond" in payload: tier = "diamond"
 
-@app.on_message(successful_payment_filter)
-async def payment_success(client, message: Message):
-    payload = message.successful_payment.invoice_payload
-    user_id = message.from_user.id
-    username = message.from_user.username or message.from_user.first_name
-    
-    tier = "free"
-    if "basic" in payload: tier = "basic"
-    elif "standard" in payload: tier = "standard"
-    elif "diamond" in payload: tier = "diamond"
+        vip_key = generate_key(tier)
+        await save_vip_key(vip_key, tier, user_id)
+        await set_user_vip_tier(user_id, tier, duration_days=30)
 
-    vip_key = generate_key(tier)
-    await save_vip_key(vip_key, tier, user_id)
-    await set_user_vip_tier(user_id, tier, duration_days=30)
-
-    await message.reply_text(
-        f"🎉 **Payment Successful!**\n\n"
-        f"Your Plan: **{tier.upper()}**\n"
-        f"🔑 Your VIP Access Key: `{vip_key}`\n\n"
-        f"Paste this key into the **Activate Key** button on the website to unlock your session instantly!"
-    )
-
-    try:
-        log_text = (
-            f"🔔 **New Premium Subscription!**\n\n"
-            f"👤 User: @{username} (ID: `{user_id}`)\n"
-            f"💎 Tier: **{tier.upper()}**\n"
-            f"🔑 Generated Key: `{vip_key}`"
+        await message.reply_text(
+            f"🎉 **Payment Successful!**\n\n"
+            f"Your Plan: **{tier.upper()}**\n"
+            f"🔑 Your VIP Access Key: `{vip_key}`\n\n"
+            f"Paste this key into the **Activate Key** button on the website to unlock your session instantly!"
         )
-        await client.send_message(chat_id=LOG_CHANNEL_ID, text=log_text)
-    except Exception as e:
-        print(f"Log Error: {e}")
+
+        try:
+            log_text = (
+                f"🔔 **New Premium Subscription!**\n\n"
+                f"👤 User: @{username} (ID: `{user_id}`)\n"
+                f"💎 Tier: **{tier.upper()}**\n"
+                f"🔑 Generated Key: `{vip_key}`"
+            )
+            await client.send_message(chat_id=LOG_CHANNEL_ID, text=log_text)
+        except Exception as e:
+            print(f"Log Error: {e}")
 
 print("HKM Python Bot Engine running...")
 app.run()
