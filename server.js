@@ -296,5 +296,5 @@ app.post('/api/user/redeem-key', async (req, res) => {
 const botProcess = spawn('python3', ['bot.py']);
 botProcess.stdout.on('data', (d) => console.log(`[BOT]: ${d}`));
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`HKM Express Server running on port ${PORT}`));
