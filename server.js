@@ -119,7 +119,7 @@ async function postToUpdateChannel(movieDoc, episodeInfo = null) {
   }
 }
 
-// Root health check endpoint for Koyeb (Prevents SIGTERM crashes)
+// Root health check endpoint for Koyeb
 app.get('/', (req, res) => {
   res.status(200).send('HKM Backend is active and running!');
 });
@@ -259,6 +259,17 @@ app.post('/api/movies', async (req, res) => {
     res.status(201).json({ success: true, movie: newMovie });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete movie and poster by ID
+app.delete('/api/movies/:id', async (req, res) => {
+  try {
+    const deletedMovie = await Movie.findByIdAndDelete(req.params.id);
+    if (!deletedMovie) return res.status(404).json({ success: false, message: 'Movie not found' });
+    res.json({ success: true, message: 'Movie and poster deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
