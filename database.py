@@ -2,11 +2,12 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime, timedelta
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://anikush8310_db_user:nPoB0GWMD34X7aeR@cluster0.yvanywe.mongodb.net/")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://anikush8310_db_user:nPoB0GWMD34X7aeR@cluster0.yvanywe.mongodb.net")
 client = AsyncIOMotorClient(MONGO_URI)
 db = client.hkmdb
 users_collection = db.users
 keys_collection = db.vip_keys
+movies_collection = db.movies
 
 async def set_user_vip_tier(telegram_id: int, tier: str, duration_days: int = 30):
     expiry_date = datetime.utcnow() + timedelta(days=duration_days)
