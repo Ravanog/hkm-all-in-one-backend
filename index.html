@@ -9,11 +9,7 @@
     tailwind.config = {
       darkMode: 'class',
       theme: {
-        extend: {
-          colors: {
-            gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
-          }
-        }
+        extend: { colors: { gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' } } }
       }
     }
   </script>
@@ -25,273 +21,252 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-amber-50/40 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased pb-24 transition-colors duration-300 selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-amber-50/40 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased pb-24 transition-colors duration-300">
 
   <!-- Navbar -->
-  <nav class="bg-white/85 dark:bg-slate-900/85 border-b border-amber-200/70 dark:border-slate-800/80 sticky top-0 z-50 backdrop-blur-xl transition-colors">
+  <nav class="bg-white/85 dark:bg-slate-900/85 border-b border-amber-200/70 dark:border-slate-800/80 sticky top-0 z-50 backdrop-blur-xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
       <div class="flex items-center gap-3 cursor-pointer" onclick="filterCategory('all')">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/25">
           <i class="fa-solid fa-play text-slate-950 text-lg ml-0.5"></i>
         </div>
-        <span class="text-xl font-extrabold tracking-wider text-slate-900 dark:text-white uppercase">HKM <span class="text-amber-500">PROVIDERS</span></span>
+        <span class="text-lg sm:text-xl font-extrabold tracking-wider text-slate-900 dark:text-white uppercase">HKM <span class="text-amber-500">PROVIDERS</span></span>
       </div>
 
-      <div class="flex items-center gap-2.5 sm:gap-3">
-        <button onclick="toggleTheme()" title="Switch Theme" class="bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl border border-amber-400/40 dark:border-amber-500/30 transition flex items-center justify-center">
-          <i id="themeIcon" class="fa-solid fa-moon text-base"></i>
+      <div class="flex items-center gap-3">
+        <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/25 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-crown"></i><span id="premiumBtnText">PREMIUM</span>
         </button>
 
-        <button onclick="openActivateModal()" class="bg-amber-500/10 dark:bg-slate-800 hover:bg-amber-500/20 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 px-3.5 py-2 rounded-xl text-xs font-bold border border-amber-500/30 transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-key"></i><span class="hidden sm:inline">Activate Key</span>
-        </button>
-
-        <button onclick="toggleModal('adminModal')" class="bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700/50 transition flex items-center gap-2">
-          <i class="fa-solid fa-plus text-amber-500"></i><span class="hidden sm:inline">Add Content</span>
-        </button>
-
-        <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:opacity-95 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/25 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-crown"></i><span id="premiumBtnText">TAKE PREMIUM</span>
+        <button onclick="toggleMenuDrawer()" class="bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl border border-amber-400/40 dark:border-amber-500/30 transition flex items-center justify-center">
+          <i id="menuIcon" class="fa-solid fa-bars text-base"></i>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Banner Slideshow Carousel -->
+  <!-- Menu Drawer -->
+  <div id="menuDrawer" class="hidden fixed inset-x-0 top-20 bg-white/95 dark:bg-slate-900/95 border-b border-amber-200 dark:border-slate-800 shadow-2xl z-40 backdrop-blur-2xl">
+    <div class="max-w-7xl mx-auto px-4 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+      <button onclick="toggleTheme(); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i id="drawerThemeIcon" class="fa-solid fa-moon"></i></div>
+        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Toggle Theme</p><p class="text-[10px] text-slate-500">Switch Dark / Light mode</p></div>
+      </button>
+
+      <button onclick="toggleModal('activateModal'); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-key"></i></div>
+        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Activate Key</p><p class="text-[10px] text-slate-500">Redeem VIP subscription key</p></div>
+      </button>
+
+      <button onclick="toggleModal('requestModal'); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></div>
+        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Request Content</p><p class="text-[10px] text-slate-500">Ask for movies, series or anime</p></div>
+      </button>
+
+      <button onclick="toggleModal('adminModal'); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-plus"></i></div>
+        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Add Content</p><p class="text-[10px] text-slate-500">Upload movie or series episode</p></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Banner Slideshow -->
   <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <div id="bannerCarousel" class="relative w-full h-[380px] sm:h-[440px] rounded-3xl overflow-hidden shadow-2xl border border-amber-200/60 dark:border-slate-800/80 group"></div>
   </header>
 
-  <!-- Top 5 Trending Section -->
+  <!-- Top 5 Trending -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-extrabold tracking-tight flex items-center gap-2 text-slate-900 dark:text-white">
         <i class="fa-solid fa-fire text-amber-500"></i> Top 5 Trending Today
       </h2>
-      <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Updated Hourly</span>
     </div>
     <div id="top5Grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
   </section>
 
-  <!-- Banner Ad Container -->
-  <div id="bannerAdContainer" class="max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8">
-    <div class="p-6 bg-amber-100/60 dark:bg-slate-900/60 border border-dashed border-amber-300 dark:border-slate-800 rounded-2xl text-center text-xs tracking-wide">
-      <p class="font-medium text-slate-500 dark:text-slate-400">[ MONETIZATION AD SPACE - MONETAG / ADSTERRA ]</p>
-    </div>
-  </div>
-
-  <!-- Categories Menu Bar -->
-  <div class="bg-white/70 dark:bg-slate-900/50 border-y border-amber-200/70 dark:border-slate-800/80 py-4 px-4 sticky top-20 z-40 backdrop-blur-md transition-colors">
+  <!-- Categories Bar -->
+  <div class="bg-white/70 dark:bg-slate-900/50 border-y border-amber-200/70 dark:border-slate-800/80 py-4 px-4 sticky top-20 z-30 backdrop-blur-md">
     <div class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-3 overflow-x-auto no-scrollbar">
-      <button onclick="filterCategory('all')" id="btn-all" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow-lg shadow-amber-500/20">All</button>
-      <button onclick="filterCategory('series')" id="btn-series" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-500/20 transition">Series</button>
-      <button onclick="filterCategory('anime')" id="btn-anime" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-500/20 transition">Anime</button>
-      <button onclick="filterCategory('premium')" id="btn-premium" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center gap-1.5">
-        <i class="fa-solid fa-crown"></i>Premium VIP
-      </button>
+      <button onclick="filterCategory('all')" id="btn-all" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">All</button>
+      <button onclick="filterCategory('series')" id="btn-series" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Series</button>
+      <button onclick="filterCategory('anime')" id="btn-anime" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Anime</button>
+      <button onclick="filterCategory('premium')" id="btn-premium" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5"><i class="fa-solid fa-crown"></i>Premium VIP</button>
     </div>
   </div>
 
-  <!-- Main Grid Section -->
+  <!-- Main Catalog Grid -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
     <div class="flex items-center justify-between mb-6">
-      <h2 id="sectionTitle" class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Full Catalog</h2>
-      <span id="movieCount" class="text-xs font-semibold bg-amber-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl text-amber-800 dark:text-slate-300 border border-amber-300/60 dark:border-slate-700/50">0 Items</span>
+      <h2 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Full Catalog</h2>
+      <span id="movieCount" class="text-xs font-semibold bg-amber-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl text-amber-800 dark:text-slate-300">0 Items</span>
     </div>
     <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
   </main>
 
-  <!-- Series / Anime Episode Selector Modal -->
+  <!-- Modals -->
   <div id="episodeModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-300 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl">
       <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <span id="epModalBadge" class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Series</span>
+          <div class="flex items-center gap-2">
+            <span id="epModalBadge" class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Series</span>
+            <span id="epModalMeta" class="text-[11px] font-semibold text-slate-500 dark:text-slate-400"></span>
+          </div>
           <h3 id="epModalTitle" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1.5">Show Title</h3>
         </div>
-        <button onclick="toggleModal('episodeModal')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
+        <button onclick="toggleModal('episodeModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-
-      <!-- Season Selector Pills -->
       <div id="seasonTabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-3 border-b border-slate-200/70 dark:border-slate-800/70"></div>
-
-      <!-- Episodes List -->
       <div id="episodesList" class="overflow-y-auto space-y-2.5 py-4 pr-1 flex-1"></div>
     </div>
   </div>
 
-  <!-- Action Choice Modal (Single Movie Stream vs Download) -->
   <div id="actionModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-8 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
-      <h3 id="actionModalTitle" class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Choose Action</h3>
-      <p id="actionModalSubtitle" class="text-slate-500 dark:text-slate-400 text-sm mb-6">Stream instantly or download via verification gateway.</p>
+      <h3 id="actionModalTitle" class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Choose Action</h3>
+      <p id="actionModalMeta" class="text-xs text-amber-600 dark:text-amber-400 font-semibold mb-4"></p>
       <div class="space-y-3">
-        <button id="streamChoiceBtn" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:opacity-95 text-slate-950 font-extrabold rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> <span id="streamBtnLabel">Stream Online (1 Ad Click)</span>
-        </button>
-        <button id="downloadChoiceBtn" class="w-full py-3.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-2xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-download"></i> <span id="downloadBtnLabel">Download File (Shortlink)</span>
-        </button>
+        <button id="streamChoiceBtn" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold rounded-2xl shadow-lg shadow-amber-500/20"><i class="fa-solid fa-play mr-2"></i>Stream Online</button>
+        <button id="downloadChoiceBtn" class="w-full py-3.5 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl"><i class="fa-solid fa-download mr-2"></i>Download File</button>
       </div>
-      <button onclick="toggleModal('actionModal')" class="mt-5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">Cancel</button>
+      <button onclick="toggleModal('actionModal')" class="mt-5 text-xs text-slate-500">Cancel</button>
     </div>
   </div>
 
-  <!-- Video Stream Player Modal -->
   <div id="streamModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-500/40 p-5 sm:p-6 rounded-3xl max-w-4xl w-full text-center relative shadow-2xl">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="streamMovieTitle" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-500 truncate pr-4">Streaming Movie</h3>
-        <button onclick="closeStreamModal()" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <h3 id="streamMovieTitle" class="text-base sm:text-lg font-bold text-amber-500 truncate pr-4">Streaming</h3>
+        <button onclick="closeStreamModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-300 dark:border-slate-800">
+      <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-800">
         <iframe id="videoPlayer" class="w-full h-full" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
-      <p id="basicPlanNotice" class="hidden text-xs text-amber-600 dark:text-amber-400 mt-4 font-medium">
-        <i class="fa-solid fa-lock mr-1"></i>Downloads are disabled on the Basic Plan (₹49). Upgrade to Standard or Diamond to download files.
-      </p>
+      <p id="basicPlanNotice" class="hidden text-xs text-amber-400 mt-4 font-medium"><i class="fa-solid fa-lock mr-1"></i>Downloads disabled on Basic Plan.</p>
     </div>
   </div>
 
-  <!-- Download Gateway Modal (Shortlink Countdown) -->
   <div id="gatewayModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-8 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
-      <div class="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
-        <i class="fa-solid fa-cloud-arrow-down animate-bounce"></i>
-      </div>
-      <h3 id="targetMovieTitle" class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Preparing Download Link...</h3>
-      <p id="gatewaySubtitle" class="text-slate-500 dark:text-slate-400 text-sm mb-6">Complete shortlink verification to download your file.</p>
-      
+      <h3 id="targetMovieTitle" class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Preparing Download...</h3>
       <div id="timerBox" class="text-3xl font-extrabold text-amber-500 mb-6">10s</div>
-      <a id="finalDownloadBtn" href="#" target="_blank" class="hidden block w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 text-white font-bold rounded-2xl shadow-lg transition">
-        <i class="fa-solid fa-bolt mr-2"></i>Get Shortlink & Download
-      </a>
-      <button onclick="closeGateway()" class="mt-4 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">Cancel</button>
+      <a id="finalDownloadBtn" href="#" target="_blank" class="hidden block w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-2xl shadow-lg"><i class="fa-solid fa-bolt mr-2"></i>Download Now</a>
+      <button onclick="closeGateway()" class="mt-4 text-xs text-slate-500">Cancel</button>
     </div>
   </div>
 
-  <!-- Key Activation Modal -->
   <div id="activateModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-8 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
-      <div class="w-14 h-14 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
-        <i class="fa-solid fa-key"></i>
-      </div>
-      <h3 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Activate VIP Access Key</h3>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Enter the unique key generated by @HKManger_Bot</p>
-      <input type="text" id="vipKeyInput" placeholder="HKM-STA-XXXXXX" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3.5 rounded-xl text-center text-sm font-mono tracking-wider text-amber-600 dark:text-amber-400 uppercase mb-4 focus:outline-none focus:border-amber-500">
-      <button onclick="submitVipKey()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-amber-500/20">Verify & Unlock</button>
-      <button onclick="toggleModal('activateModal')" class="mt-4 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Cancel</button>
+      <h3 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Activate VIP Key</h3>
+      <input type="text" id="vipKeyInput" placeholder="HKM-STA-XXXXXX" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-center text-sm font-mono text-amber-400 uppercase mb-4 focus:outline-none focus:border-amber-500">
+      <button onclick="submitVipKey()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold rounded-xl text-xs">Verify & Unlock</button>
+      <button onclick="toggleModal('activateModal')" class="mt-4 text-xs text-slate-500">Cancel</button>
     </div>
   </div>
 
-  <!-- Plans Selection Modal (Affordable INR Pricing) -->
   <div id="premiumModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-900 border border-amber-500/40 p-6 sm:p-8 rounded-3xl max-w-3xl w-full text-center relative shadow-2xl my-8">
-      <div class="w-14 h-14 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
-        <i class="fa-solid fa-crown"></i>
-      </div>
       <h3 class="text-2xl font-extrabold mb-1 text-slate-900 dark:text-white">Choose Your VIP Plan</h3>
-      <p class="text-slate-500 dark:text-slate-400 text-sm mb-7">Affordable plans in Indian Rupees (₹). Instant activation via Telegram.</p>
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-7">
-        <div class="bg-amber-50/70 dark:bg-slate-950 border border-amber-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
-          <div>
-            <h4 class="font-bold text-base text-slate-800 dark:text-slate-200">Basic</h4>
-            <p class="text-3xl font-extrabold text-amber-500 my-2">₹49<span class="text-xs text-slate-500 font-normal">/mo</span></p>
-            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2.5 mt-4">
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Ad-Free Browsing</li>
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Direct Website Streaming</li>
-              <li><i class="fa-solid fa-xmark text-red-500 mr-2"></i> No File Downloads</li>
-              <li><i class="fa-solid fa-xmark text-red-500 mr-2"></i> VIP Movies Locked</li>
-            </ul>
-          </div>
-          <button onclick="selectPlan('buy_basic')" class="mt-7 w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">Select Basic (₹49)</button>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-7 mt-6">
+        <div class="bg-amber-50/70 dark:bg-slate-950 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
+          <div><h4 class="font-bold text-base">Basic</h4><p class="text-3xl font-extrabold text-amber-500 my-2">₹49<span class="text-xs text-slate-500">/mo</span></p></div>
+          <button onclick="selectPlan('buy_basic')" class="mt-7 w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-xs">Select Basic</button>
         </div>
-
-        <div class="bg-amber-50 dark:bg-slate-950 border-2 border-amber-500 p-6 rounded-2xl flex flex-col justify-between text-left relative shadow-xl shadow-amber-500/10">
-          <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">Most Popular</span>
-          <div>
-            <h4 class="font-bold text-base text-slate-900 dark:text-white">Standard</h4>
-            <p class="text-3xl font-extrabold text-amber-500 my-2">₹99<span class="text-xs text-slate-500 font-normal">/mo</span></p>
-            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2.5 mt-4">
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Ad-Free Streaming</li>
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> VIP Movies Unlocked</li>
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Full Download Access</li>
-            </ul>
-          </div>
-          <button onclick="selectPlan('buy_standard')" class="mt-7 w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:opacity-95 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg shadow-amber-500/20">Select Standard (₹99)</button>
+        <div class="bg-amber-50 dark:bg-slate-950 border-2 border-amber-500 p-6 rounded-2xl flex flex-col justify-between text-left relative">
+          <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase">Popular</span>
+          <div><h4 class="font-bold text-base">Standard</h4><p class="text-3xl font-extrabold text-amber-500 my-2">₹99<span class="text-xs text-slate-500">/mo</span></p></div>
+          <button onclick="selectPlan('buy_standard')" class="mt-7 w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold rounded-xl text-xs">Select Standard</button>
         </div>
-
-        <div class="bg-amber-50/70 dark:bg-slate-950 border border-amber-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
-          <div>
-            <h4 class="font-bold text-base text-purple-600 dark:text-purple-400">Diamond</h4>
-            <p class="text-3xl font-extrabold text-amber-500 my-2">₹299<span class="text-xs text-slate-500 font-normal">/yr</span></p>
-            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2.5 mt-4">
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Zero Shortlinks</li>
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> All VIP Movies Unlocked</li>
-              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Direct Instant Downloads</li>
-            </ul>
-          </div>
-          <button onclick="selectPlan('buy_diamond')" class="mt-7 w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">Select Diamond (₹299)</button>
+        <div class="bg-amber-50/70 dark:bg-slate-950 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between text-left">
+          <div><h4 class="font-bold text-base text-purple-400">Diamond</h4><p class="text-3xl font-extrabold text-amber-500 my-2">₹299<span class="text-xs text-slate-500">/yr</span></p></div>
+          <button onclick="selectPlan('buy_diamond')" class="mt-7 w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-xs">Select Diamond</button>
         </div>
       </div>
-      <button onclick="toggleModal('premiumModal')" class="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">Cancel</button>
+      <button onclick="toggleModal('premiumModal')" class="text-xs text-slate-500">Cancel</button>
     </div>
   </div>
 
-  <!-- Manual Upload Modal (Supports Movie OR Episode-wise Series/Anime) -->
+  <!-- Manual Upload Modal (adminModal with Credits) -->
   <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl my-8">
-      <h2 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">Add Movie / Series / Anime</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">For Series or Anime, enter the exact show title to group episodes together.</p>
-      
-      <form onsubmit="submitManualMovie(event)" class="space-y-3">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Add Content & Credits</h2>
+        <button onclick="toggleModal('adminModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form onsubmit="submitManualMovie(event)" class="space-y-3 mt-3">
         <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Content Type</label>
-            <select id="mCategory" onchange="toggleEpisodeFields()" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
-              <option value="Action">Movie (Action/Drama)</option>
-              <option value="Series">Series (Episode-wise)</option>
-              <option value="Anime">Anime (Episode-wise)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Access Level</label>
-            <select id="mPremium" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm">
-              <option value="false">Free</option>
-              <option value="true">VIP Only</option>
-            </select>
-          </div>
+          <select id="mCategory" onchange="toggleEpisodeFields()" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+            <option value="Action">Movie</option>
+            <option value="Series">Series</option>
+            <option value="Anime">Anime</option>
+          </select>
+          <select id="mPremium" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+            <option value="false">Free</option>
+            <option value="true">VIP Only</option>
+          </select>
+        </div>
+        <input type="text" id="mTitle" placeholder="Title" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+        
+        <div id="episodeFields" class="hidden grid grid-cols-3 gap-3 bg-amber-500/5 p-3 rounded-2xl border border-amber-500/20">
+          <input type="number" id="mSeason" value="1" min="1" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-sm" placeholder="Season">
+          <input type="number" id="mEpisode" value="1" min="1" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-sm" placeholder="Ep #">
+          <input type="text" id="mEpisodeTitle" placeholder="Ep Name" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-sm">
         </div>
 
-        <input type="text" id="mTitle" placeholder="Movie or Series/Anime Title" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        
-        <!-- Episode-specific fields (Shown when Series or Anime is selected) -->
-        <div id="episodeFields" class="hidden grid grid-cols-3 gap-3 bg-amber-500/5 border border-amber-500/20 p-3 rounded-2xl">
-          <div>
-            <label class="block text-[10px] font-bold text-amber-500 mb-1">Season</label>
-            <input type="number" id="mSeason" value="1" min="1" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-amber-500 mb-1">Episode #</label>
-            <input type="number" id="mEpisode" value="1" min="1" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-amber-500 mb-1">Ep. Name (Opt)</label>
-            <input type="text" id="mEpisodeTitle" placeholder="Pilot" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-2.5 rounded-xl text-sm">
-          </div>
+        <div class="grid grid-cols-3 gap-3">
+          <input type="text" id="mRating" placeholder="Rating" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+          <input type="text" id="mLanguage" placeholder="Language" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+          <input type="text" id="mQuality" placeholder="Quality" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
         </div>
 
-        <input type="url" id="mPoster" placeholder="Poster Image URL (https://...)" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        <input type="url" id="mStream" placeholder="Stream URL (Direct video / Embed)" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        <input type="url" id="mDownload" placeholder="Download File URL" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        <input type="text" id="mQuality" placeholder="Quality (4K / 1080p)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
-        
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 mb-1">Upload Credit / Uploader</label>
+          <select id="mCredit" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm text-amber-500 font-bold">
+            <option value="RKN">RKN</option>
+            <option value="MGBM">MGBM</option>
+            <option value="AK_Kiccha1">AK_Kiccha1</option>
+            <option value="Hari_Moviez" selected>Hari_Moviez</option>
+            <option value="Cinemaniacs">Cinemaniacs</option>
+            <option value="ɮǟǟɖֆɦǟɦ">ɮǟǟɖֆɦǟɦ</option>
+          </select>
+        </div>
+
+        <input type="url" id="mPoster" placeholder="Poster URL (Blank to auto-fetch)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        <input type="url" id="mStream" placeholder="Stream URL" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        <input type="url" id="mDownload" placeholder="Download URL" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" onclick="toggleModal('adminModal')" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-amber-500/20">Save Content</button>
+          <button type="button" onclick="toggleModal('adminModal')" class="px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl">Cancel</button>
+          <button type="submit" id="saveMovieBtn" class="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-extrabold rounded-xl">Save & Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="requestModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 border border-amber-500/40 p-6 sm:p-8 rounded-3xl max-w-md w-full shadow-2xl my-8">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Request Content</h2>
+        <button onclick="toggleModal('requestModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form onsubmit="submitContentRequest(event)" class="space-y-3 mt-3">
+        <input type="text" id="reqTitle" placeholder="Title *" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <select id="reqCategory" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+            <option value="Movie">Movie</option>
+            <option value="Series">Series</option>
+            <option value="Anime">Anime</option>
+          </select>
+          <input type="text" id="reqLanguage" placeholder="Language" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        </div>
+        <input type="text" id="reqSeasonEp" placeholder="Season / Episode (Opt)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+          <input type="text" id="reqUserName" placeholder="Your Name *" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+          <input type="text" id="reqTgUser" placeholder="@TelegramUser" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="toggleModal('requestModal')" class="px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl">Cancel</button>
+          <button type="submit" id="sendReqBtn" class="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-extrabold rounded-xl">Send Request</button>
         </div>
       </form>
     </div>
@@ -299,8 +274,7 @@
 
   <script>
     const API_BASE = "https://your-koyeb-backend-url.koyeb.app/api";
-    const SHORTLINK_API_KEY = "YOUR_SHORTENER_API_TOKEN";
-    const SHORTLINK_BASE_URL = "https://exe.io/api?api=" + SHORTLINK_API_KEY + "&url=";
+    const SHORTLINK_BASE_URL = "https://exe.io/api?api=YOUR_TOKEN&url=";
     const MONETAG_AD_URL = "https://your-monetag-ad-link.com";
 
     let currentUserTier = localStorage.getItem('hkm_user_tier') || 'free'; 
@@ -308,80 +282,55 @@
     let currentSlide = 0, slideInterval;
     let activeShow = null, activeSeason = 1;
 
+    function toggleMenuDrawer() {
+      const drawer = document.getElementById('menuDrawer');
+      const icon = document.getElementById('menuIcon');
+      drawer.classList.toggle('hidden');
+      if (drawer.classList.contains('hidden')) icon.className = "fa-solid fa-bars text-base";
+      else icon.className = "fa-solid fa-xmark text-base";
+    }
+
     function toggleTheme() {
       const htmlEl = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
+      const drawerThemeIcon = document.getElementById('drawerThemeIcon');
       if (htmlEl.classList.contains('dark')) {
         htmlEl.classList.remove('dark');
-        themeIcon.className = "fa-solid fa-sun text-base";
+        if(themeIcon) themeIcon.className = "fa-solid fa-sun text-base";
+        if(drawerThemeIcon) drawerThemeIcon.className = "fa-solid fa-sun";
         localStorage.setItem('hkm_theme', 'light');
       } else {
         htmlEl.classList.add('dark');
-        themeIcon.className = "fa-solid fa-moon text-base";
+        if(themeIcon) themeIcon.className = "fa-solid fa-moon text-base";
+        if(drawerThemeIcon) drawerThemeIcon.className = "fa-solid fa-moon";
         localStorage.setItem('hkm_theme', 'dark');
       }
     }
 
     if (localStorage.getItem('hkm_theme') === 'light') {
       document.documentElement.classList.remove('dark');
-      document.getElementById('themeIcon').className = "fa-solid fa-sun text-base";
+      const icon = document.getElementById('drawerThemeIcon');
+      if(icon) icon.className = "fa-solid fa-sun";
     }
 
     function toggleEpisodeFields() {
       const cat = document.getElementById('mCategory').value;
       const epBox = document.getElementById('episodeFields');
-      if (cat === 'Series' || cat === 'Anime') {
-        epBox.classList.remove('hidden');
-      } else {
-        epBox.classList.add('hidden');
-      }
-    }
-
-    const demoMovies = [
-      {
-        _id: '1', title: 'Inception', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600',
-        backdropUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200',
-        category: 'Action', quality: '4K UHD', views: 42500, isPremium: false,
-        streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/download/1', episodes: []
-      },
-      {
-        _id: '2', title: 'Stranger Things', posterUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600',
-        backdropUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1200',
-        category: 'Series', quality: '1080p', views: 98100, isPremium: true,
-        episodes: [
-          { season: 1, episode: 1, title: 'The Vanishing of Will Byers', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s1e1' },
-          { season: 1, episode: 2, title: 'The Weirdo on Maple Street', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s1e2' },
-          { season: 2, episode: 1, title: 'MADMAX', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/st-s2e1' }
-        ]
-      },
-      {
-        _id: '3', title: 'Attack on Titan', posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600',
-        backdropUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200',
-        category: 'Anime', quality: '4K', views: 76400, isPremium: false,
-        episodes: [
-          { season: 1, episode: 1, title: 'To You, in 2000 Years', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/aot-e1' },
-          { season: 1, episode: 2, title: 'That Day', streamUrl: 'https://www.youtube.com/embed/YoHD9XEInc0', downloadUrl: 'https://example.com/aot-e2' }
-        ]
-      }
-    ];
-
-    function applyUserPermissions() {
-      if (currentUserTier !== 'free') {
-        document.getElementById('bannerAdContainer').style.display = 'none';
-        document.getElementById('premiumBtnText').innerText = `${currentUserTier.toUpperCase()} VIP`;
-      }
+      if (cat === 'Series' || cat === 'Anime') epBox.classList.remove('hidden');
+      else epBox.classList.add('hidden');
     }
 
     async function loadMovies() {
-      applyUserPermissions();
       try {
         const res = await fetch(`${API_BASE}/movies`);
         moviesData = await res.json();
-        if (!moviesData || moviesData.length === 0) moviesData = demoMovies;
-      } catch (e) { moviesData = demoMovies; }
+      } catch (e) { moviesData = []; }
       renderBannerSlideshow();
       renderTop5();
       renderMovies(currentFilter);
+
+      const watchId = new URLSearchParams(window.location.search).get('watch');
+      if (watchId) openItem(watchId);
     }
 
     function renderBannerSlideshow() {
@@ -390,16 +339,13 @@
       if (slides.length === 0) return;
 
       banner.innerHTML = slides.map((m, idx) => `
-        <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
-          <img src="${m.backdropUrl || m.posterUrl}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
+          <img src="${m.posterUrl}" class="w-full h-full object-cover">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-          <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent"></div>
           <div class="absolute bottom-8 left-8 right-8 max-w-xl">
-            <span class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">${m.category} • ${m.quality}</span>
-            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">${m.title}</h2>
-            <button onclick="openItem('${m._id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-xl font-extrabold text-xs flex items-center gap-2 shadow-lg transition">
-              <i class="fa-solid fa-play"></i> ${m.episodes && m.episodes.length > 0 ? 'Browse Episodes' : 'Watch / Download'}
-            </button>
+            <span class="bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase mb-3 inline-block">${m.category} • ⭐ ${m.rating || '8.5'} • By ${m.credit || 'Hari_Moviez'}</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-4">${m.title}</h2>
+            <button onclick="openItem('${m._id}')" class="bg-amber-500 text-slate-950 px-6 py-3 rounded-xl font-extrabold text-xs flex items-center gap-2"><i class="fa-solid fa-play"></i> Watch</button>
           </div>
         </div>
       `).join('');
@@ -412,44 +358,20 @@
     }
 
     function renderTop5() {
-      const top5Container = document.getElementById('top5Grid');
+      const container = document.getElementById('top5Grid');
       const sorted = [...moviesData].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
-      
-      top5Container.innerHTML = sorted.map((m, index) => `
-        <div onclick="openItem('${m._id}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer shadow-sm">
-          <div class="aspect-[2/3] overflow-hidden relative">
-            <img src="${m.posterUrl}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-            <div class="absolute top-2 left-2 w-8 h-8 rounded-xl bg-slate-900/90 flex items-center justify-center font-extrabold text-sm text-amber-400 shadow-lg">
-              #${index + 1}
-            </div>
-            ${m.isPremium ? '<span class="absolute top-2 right-2 bg-amber-500 text-slate-950 font-bold text-[9px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-crown mr-0.5"></i>VIP</span>' : ''}
-          </div>
-          <div class="p-3.5">
-            <h3 class="font-bold text-xs truncate text-slate-900 dark:text-slate-100">${m.title}</h3>
-            <p class="text-[10px] text-amber-600 dark:text-amber-500 mt-1"><i class="fa-solid fa-eye"></i> ${formatViews(m.views)} views</p>
-          </div>
+      container.innerHTML = sorted.map((m, idx) => `
+        <div onclick="openItem('${m._id}')" class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 cursor-pointer">
+          <div class="aspect-[2/3] relative"><img src="${m.posterUrl}" class="w-full h-full object-cover"><div class="absolute top-2 left-2 w-7 h-7 bg-slate-950/90 text-amber-400 font-bold flex items-center justify-center rounded-lg text-xs">#${idx+1}</div></div>
+          <div class="p-3"><h3 class="font-bold text-xs truncate">${m.title}</h3><p class="text-[9px] text-amber-500 mt-0.5">By ${m.credit || 'Hari_Moviez'}</p></div>
         </div>
       `).join('');
     }
 
-    function formatViews(c) {
-      if (!c) return '0';
-      if (c >= 1e6) return (c / 1e6).toFixed(1) + 'M';
-      if (c >= 1e3) return (c / 1e3).toFixed(1) + 'K';
-      return c;
-    }
-
     function filterCategory(cat) {
       currentFilter = cat;
-      document.querySelectorAll('.menu-tab').forEach(btn => {
-        btn.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-500/20 transition";
-      });
-      const activeBtn = document.getElementById(`btn-${cat}`);
-      if (activeBtn) {
-        activeBtn.className = cat === 'premium'
-          ? "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow-lg shadow-amber-500/20 flex items-center gap-1.5"
-          : "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow-lg shadow-amber-500/20";
-      }
+      document.querySelectorAll('.menu-tab').forEach(b => b.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300");
+      document.getElementById(`btn-${cat}`).className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950";
       renderMovies(cat);
     }
 
@@ -465,26 +387,19 @@
       document.getElementById('movieCount').innerText = `${filtered.length} Items`;
 
       filtered.forEach(m => {
-        const hasEpisodes = m.episodes && m.episodes.length > 0;
-        const badgeText = hasEpisodes ? `${m.episodes.length} Eps` : m.quality;
-
+        const hasEps = m.episodes && m.episodes.length > 0;
         grid.innerHTML += `
-          <div onclick="openItem('${m._id}')" class="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-amber-200 dark:border-slate-800 hover:border-amber-500 transition cursor-pointer flex flex-col justify-between shadow-sm">
-            <div class="aspect-[2/3] overflow-hidden relative">
-              <img src="${m.posterUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 bg-slate-950/40">
-                <span class="bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg">
-                  ${hasEpisodes ? 'Select Episode' : 'Stream / Download'}
-                </span>
-              </div>
-              ${m.isPremium ? '<span class="absolute top-3 left-3 bg-amber-500 text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-full shadow"><i class="fa-solid fa-crown mr-1"></i>VIP</span>' : ''}
-              <span class="absolute top-3 right-3 bg-slate-900/85 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded">${badgeText}</span>
+          <div onclick="openItem('${m._id}')" class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 cursor-pointer flex flex-col justify-between group">
+            <div class="aspect-[2/3] relative overflow-hidden">
+              <img src="${m.posterUrl}" class="w-full h-full object-cover group-hover:scale-105 transition">
+              ${m.isPremium ? '<span class="absolute top-2 left-2 bg-amber-500 text-slate-950 text-[9px] font-bold px-2 py-0.5 rounded-full">VIP</span>' : ''}
+              <span class="absolute top-2 right-2 bg-slate-950/80 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded">${hasEps ? m.episodes.length+' Eps' : m.quality}</span>
             </div>
-            <div class="p-4">
-              <h3 class="font-bold text-sm truncate text-slate-900 dark:text-slate-100">${m.title}</h3>
-              <div class="flex items-center justify-between mt-2 text-xs">
-                <span class="text-slate-500 dark:text-slate-400"><i class="fa-solid fa-eye text-amber-500 mr-1"></i>${formatViews(m.views)}</span>
-                <span class="text-amber-600 dark:text-amber-500 font-semibold">${hasEpisodes ? 'Episodes' : 'Select'} &rarr;</span>
+            <div class="p-3.5">
+              <h3 class="font-bold text-xs truncate">${m.title}</h3>
+              <div class="flex items-center justify-between mt-1 text-[10px]">
+                <span class="text-slate-400">⭐ ${m.rating||'N/A'}</span>
+                <span class="text-amber-500 font-semibold truncate ml-1">By ${m.credit || 'Hari_Moviez'}</span>
               </div>
             </div>
           </div>
@@ -492,266 +407,142 @@
       });
     }
 
-    // Master handler when clicking a Movie, Series, or Anime card
     async function openItem(id) {
       const item = moviesData.find(m => m._id === id);
       if (!item) return;
+      try { await fetch(`${API_BASE}/movies/${id}/view`, { method: 'POST' }); } catch(e){}
 
-      try {
-        await fetch(`${API_BASE}/movies/${id}/view`, { method: 'POST' });
-      } catch (e) {}
-
-      // Check VIP lock
-      if (item.isPremium && (currentUserTier === 'free' || currentUserTier === 'basic')) {
-        alert("🔒 VIP content requires a Standard (₹99) or Diamond (₹299) plan.");
+      if (item.isPremium && currentUserTier === 'free') {
         openPremiumModal();
         return;
       }
 
-      // If Series/Anime with Episodes -> Open Episode Selector Modal
       if (item.episodes && item.episodes.length > 0) {
         openEpisodeModal(item);
         return;
       }
-
-      // Otherwise handle as standalone Movie
-      openSingleActionModal(item.title, item.streamUrl, item.downloadUrl);
+      openSingleActionModal(item);
     }
 
-    // Render Season Tabs & Episode List
     function openEpisodeModal(show) {
       activeShow = show;
       document.getElementById('epModalBadge').innerText = show.category;
+      document.getElementById('epModalMeta').innerText = `⭐ ${show.rating||'N/A'} • By ${show.credit || 'Hari_Moviez'} • ${show.quality}`;
       document.getElementById('epModalTitle').innerText = show.title;
 
-      const seasons = [...new Set(show.episodes.map(e => e.season || 1))].sort((a, b) => a - b);
+      const seasons = [...new Set(show.episodes.map(e => e.season || 1))].sort((a,b)=>a-b);
       activeSeason = seasons[0] || 1;
-
       renderSeasonTabs(seasons);
       renderEpisodesList();
-      document.getElementById('episodeModal').classList.remove('hidden');
+      toggleModal('episodeModal');
     }
 
     function renderSeasonTabs(seasons) {
-      const tabBox = document.getElementById('seasonTabs');
-      tabBox.innerHTML = seasons.map(s => `
-        <button onclick="switchSeason(${s})" class="px-4 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${s === activeSeason ? 'bg-amber-500 text-slate-950 shadow' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}">
-          Season ${s}
-        </button>
+      document.getElementById('seasonTabs').innerHTML = seasons.map(s => `
+        <button onclick="activeSeason=${s};renderEpisodesList()" class="px-4 py-1.5 rounded-xl text-xs font-bold ${s===activeSeason?'bg-amber-500 text-slate-950':'bg-slate-800 text-slate-300'}">Season ${s}</button>
       `).join('');
     }
 
-    function switchSeason(seasonNum) {
-      activeSeason = seasonNum;
-      const seasons = [...new Set(activeShow.episodes.map(e => e.season || 1))].sort((a, b) => a - b);
-      renderSeasonTabs(seasons);
-      renderEpisodesList();
-    }
-
     function renderEpisodesList() {
-      const listBox = document.getElementById('episodesList');
-      const eps = activeShow.episodes
-        .filter(e => (e.season || 1) === activeSeason)
-        .sort((a, b) => a.episode - b.episode);
-
-      listBox.innerHTML = eps.map(ep => {
-        const fullEpTitle = `${activeShow.title} - S${activeSeason}E${ep.episode}`;
-        const safeTitle = fullEpTitle.replace(/'/g, "\\'");
-        const downloadAllowed = currentUserTier !== 'basic';
-
-        return `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-950 border border-amber-200/80 dark:border-slate-800">
-            <div class="flex items-center gap-3 min-w-0">
-              <span class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs flex items-center justify-center shrink-0">
-                E${ep.episode}
-              </span>
-              <div class="truncate">
-                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">${ep.title || 'Episode ' + ep.episode}</p>
-                <p class="text-[10px] text-slate-500">Season ${activeSeason} • Episode ${ep.episode}</p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <button onclick="startEpisodeStream('${safeTitle}', '${ep.streamUrl}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-[11px] flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-play"></i> Stream
-              </button>
-              ${downloadAllowed ? `
-                <button onclick="startEpisodeDownload('${safeTitle}', '${ep.downloadUrl}')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1.5 transition">
-                  <i class="fa-solid fa-download"></i> Download
-                </button>
-              ` : `
-                <span class="px-2.5 py-2 bg-slate-200 dark:bg-slate-800/60 text-slate-400 rounded-xl text-[10px] font-semibold">
-                  <i class="fa-solid fa-lock mr-1"></i>Stream Only
-                </span>
-              `}
-            </div>
+      const eps = activeShow.episodes.filter(e => (e.season||1) === activeSeason).sort((a,b)=>a.episode-b.episode);
+      document.getElementById('episodesList').innerHTML = eps.map(ep => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+          <div><p class="text-xs font-bold">E${ep.episode}: ${ep.title}</p></div>
+          <div class="flex gap-2">
+            <button onclick="toggleModal('episodeModal');handleStream('${activeShow.title} - S${activeSeason}E${ep.episode}','${ep.streamUrl}')" class="px-3 py-1.5 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs">Stream</button>
+            <button onclick="toggleModal('episodeModal');handleDownload('${ep.downloadUrl}')" class="px-3 py-1.5 bg-slate-800 text-white font-bold rounded-lg text-xs">Download</button>
           </div>
-        `;
-      }).join('');
+        </div>
+      `).join('');
     }
 
-    function startEpisodeStream(title, streamUrl) {
-      toggleModal('episodeModal');
-      handleStreamClick(title, streamUrl);
+    function openSingleActionModal(item) {
+      document.getElementById('actionModalTitle').innerText = item.title;
+      document.getElementById('actionModalMeta').innerText = `⭐ ${item.rating||'N/A'} • By ${item.credit || 'Hari_Moviez'} • ${item.quality}`;
+      document.getElementById('streamChoiceBtn').onclick = () => { toggleModal('actionModal'); handleStream(item.title, item.streamUrl); };
+      document.getElementById('downloadChoiceBtn').onclick = () => { toggleModal('actionModal'); handleDownload(item.downloadUrl); };
+      toggleModal('actionModal');
     }
 
-    function startEpisodeDownload(title, downloadUrl) {
-      toggleModal('episodeModal');
-      document.getElementById('targetMovieTitle').innerText = title;
-      handleDownloadClick(downloadUrl);
-    }
-
-    // Single Movie Action Modal
-    function openSingleActionModal(title, streamUrl, downloadUrl) {
-      if (currentUserTier === 'basic') {
-        document.getElementById('basicPlanNotice').classList.remove('hidden');
-        document.getElementById('streamMovieTitle').innerText = `Streaming: ${title}`;
-        document.getElementById('videoPlayer').src = streamUrl;
-        document.getElementById('streamModal').classList.remove('hidden');
-        return;
-      }
-
-      document.getElementById('basicPlanNotice').classList.add('hidden');
-      document.getElementById('actionModalTitle').innerText = title;
-
-      document.getElementById('streamBtnLabel').innerText = currentUserTier === 'free'
-        ? "Stream Online (1 Ad Click)"
-        : "Stream Online (Ad-Free VIP)";
-
-      document.getElementById('downloadBtnLabel').innerText = currentUserTier === 'diamond'
-        ? "Direct Download (No Shortlink)"
-        : "Download File (Shortlink)";
-
-      document.getElementById('streamChoiceBtn').onclick = () => {
-        toggleModal('actionModal');
-        handleStreamClick(title, streamUrl);
-      };
-      document.getElementById('downloadChoiceBtn').onclick = () => {
-        toggleModal('actionModal');
-        document.getElementById('targetMovieTitle').innerText = title;
-        handleDownloadClick(downloadUrl);
-      };
-      document.getElementById('actionModal').classList.remove('hidden');
-    }
-
-    function handleStreamClick(title, streamUrl) {
-      if (currentUserTier === 'free') {
-        window.open(MONETAG_AD_URL, '_blank');
-      }
-      if (currentUserTier === 'basic') {
-        document.getElementById('basicPlanNotice').classList.remove('hidden');
-      } else {
-        document.getElementById('basicPlanNotice').classList.add('hidden');
-      }
-      document.getElementById('streamMovieTitle').innerText = `Streaming: ${title}`;
-      document.getElementById('videoPlayer').src = streamUrl;
+    function handleStream(title, url) {
+      if (currentUserTier === 'free') window.open(MONETAG_AD_URL, '_blank');
+      document.getElementById('streamMovieTitle').innerText = title;
+      document.getElementById('videoPlayer').src = url;
       document.getElementById('streamModal').classList.remove('hidden');
     }
 
-    function handleDownloadClick(downloadUrl) {
+    function handleDownload(url) {
       document.getElementById('gatewayModal').classList.remove('hidden');
-      document.getElementById('finalDownloadBtn').classList.add('hidden');
-      document.getElementById('timerBox').classList.remove('hidden');
-
-      if (currentUserTier === 'diamond') {
-        document.getElementById('timerBox').classList.add('hidden');
-        document.getElementById('gatewaySubtitle').innerText = "Diamond VIP instant download unlocked!";
-        const dlBtn = document.getElementById('finalDownloadBtn');
-        dlBtn.href = downloadUrl;
-        dlBtn.innerText = "Direct Download (Diamond VIP)";
-        dlBtn.classList.remove('hidden');
-        return;
-      }
-
-      document.getElementById('gatewaySubtitle').innerText = "Complete shortlink verification to download your file.";
       let timeLeft = 10;
-      const timerBox = document.getElementById('timerBox');
-      timerBox.innerText = `${timeLeft}s`;
-      const timer = setInterval(async () => {
+      const timer = setInterval(() => {
         timeLeft--;
-        timerBox.innerText = `${timeLeft}s`;
+        document.getElementById('timerBox').innerText = timeLeft + 's';
         if (timeLeft <= 0) {
           clearInterval(timer);
-          timerBox.classList.add('hidden');
-          
-          let finalLink = downloadUrl;
-          try {
-            const shortRes = await fetch(SHORTLINK_BASE_URL + encodeURIComponent(downloadUrl));
-            const shortData = await shortRes.json();
-            if (shortData.shortened_url) finalLink = shortData.shortened_url;
-          } catch (err) {}
-
+          document.getElementById('timerBox').classList.add('hidden');
           const dlBtn = document.getElementById('finalDownloadBtn');
-          dlBtn.href = finalLink;
-          dlBtn.innerText = "Click to Generate Shortlink & Download";
+          dlBtn.href = url;
           dlBtn.classList.remove('hidden');
         }
       }, 1000);
     }
 
-    function closeStreamModal() {
-      document.getElementById('streamModal').classList.add('hidden');
-      document.getElementById('videoPlayer').src = "";
-    }
-
+    function closeStreamModal() { document.getElementById('streamModal').classList.add('hidden'); document.getElementById('videoPlayer').src = ''; }
     function closeGateway() { document.getElementById('gatewayModal').classList.add('hidden'); }
-    function openActivateModal() { document.getElementById('activateModal').classList.remove('hidden'); }
-    function openPremiumModal() { document.getElementById('premiumModal').classList.remove('hidden'); }
+    function openActivateModal() { toggleModal('activateModal'); }
+    function openPremiumModal() { toggleModal('premiumModal'); }
     function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
 
     async function submitVipKey() {
-      const keyVal = document.getElementById('vipKeyInput').value.trim();
-      if (!keyVal) { alert("Please enter a valid key."); return; }
-      try {
-        const res = await fetch(`${API_BASE}/user/redeem-key`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: keyVal })
-        });
-        const data = await res.json();
-        if (data.success) {
-          currentUserTier = data.tier;
-          localStorage.setItem('hkm_user_tier', data.tier);
-          alert(`🎉 Success! Upgraded to ${data.tier.toUpperCase()} VIP.`);
-          toggleModal('activateModal');
-          applyUserPermissions();
-          loadMovies();
-        } else { alert("❌ " + data.message); }
-      } catch (e) {
-        alert("Connection error while redeeming key.");
-      }
+      const key = document.getElementById('vipKeyInput').value.trim();
+      const res = await fetch(`${API_BASE}/user/redeem-key`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key}) });
+      const data = await res.json();
+      if (data.success) { currentUserTier = data.tier; localStorage.setItem('hkm_user_tier', data.tier); alert(data.message); toggleModal('activateModal'); loadMovies(); }
+      else alert(data.message);
     }
 
-    function selectPlan(payload) {
-      window.open(`https://t.me/HKManger_Bot?start=${payload}`, '_blank');
-    }
+    function selectPlan(payload) { window.open(`https://t.me/HKManger_Bot?start=${payload}`, '_blank'); }
 
     async function submitManualMovie(e) {
       e.preventDefault();
       const category = document.getElementById('mCategory').value;
-      const bodyData = {
+      const body = {
         title: document.getElementById('mTitle').value,
         posterUrl: document.getElementById('mPoster').value,
         streamUrl: document.getElementById('mStream').value,
         downloadUrl: document.getElementById('mDownload').value,
-        category: category,
+        category,
+        rating: document.getElementById('mRating').value || 'N/A',
+        language: document.getElementById('mLanguage').value || 'Multi Audio',
         quality: document.getElementById('mQuality').value || '1080p',
+        credit: document.getElementById('mCredit').value,
         isPremium: document.getElementById('mPremium').value === 'true'
       };
-
-      if (category === 'Series' || category === 'Anime') {
-        bodyData.season = Number(document.getElementById('mSeason').value) || 1;
-        bodyData.episode = Number(document.getElementById('mEpisode').value) || 1;
-        bodyData.episodeTitle = document.getElementById('mEpisodeTitle').value || `Episode ${bodyData.episode}`;
+      if (['Series', 'Anime'].includes(category)) {
+        body.season = Number(document.getElementById('mSeason').value) || 1;
+        body.episode = Number(document.getElementById('mEpisode').value) || 1;
+        body.episodeTitle = document.getElementById('mEpisodeTitle').value || `Episode ${body.episode}`;
       }
-
-      await fetch(`${API_BASE}/movies`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyData)
-      });
+      await fetch(`${API_BASE}/movies`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
       toggleModal('adminModal');
       loadMovies();
+    }
+
+    async function submitContentRequest(e) {
+      e.preventDefault();
+      const body = {
+        title: document.getElementById('reqTitle').value,
+        category: document.getElementById('reqCategory').value,
+        language: document.getElementById('reqLanguage').value,
+        seasonEpisode: document.getElementById('reqSeasonEp').value,
+        userName: document.getElementById('reqUserName').value,
+        telegramUsername: document.getElementById('reqTgUser').value,
+        userTier: currentUserTier
+      };
+      const res = await fetch(`${API_BASE}/request`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (data.success) { alert("Request sent!"); toggleModal('requestModal'); e.target.reset(); }
+      else alert("Error sending request.");
     }
 
     loadMovies();
