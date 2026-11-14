@@ -7,7 +7,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
-# Define custom classes and compatibility patches for older Pyrogram versions
+# Compatibility classes and wrappers for robust Pyrogram execution
 class LabeledPrice:
     def __init__(self, label: str, amount: int):
         self.label = label
@@ -33,13 +33,14 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-# Add compatibility patch for missing decorator in Pyrogram
 if not hasattr(app, 'on_pre_checkout_query'):
     def custom_on_pre_checkout_query():
         def decorator(func):
             return func
         return decorator
     app.on_pre_checkout_query = custom_on_pre_checkout_query
+
+successful_payment_filter = filters.create(lambda _, __, msg: bool(msg.successful_payment))
 
 def generate_key(tier: str) -> str:
     prefix = tier[:3].upper()
@@ -212,7 +213,7 @@ async def checkout_handler(client, query):
     except Exception as e:
         print(f"Checkout Error: {e}")
 
-@app.on_message(filters.successful_payment)
+@app.on_message(successful_payment_filter)
 async def payment_success(client, message: Message):
     payload = message.successful_payment.invoice_payload
     user_id = message.from_user.id
