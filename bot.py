@@ -18,7 +18,7 @@ WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.ver
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 # Set your UPI ID here for manual/QR payments
-UPI_ID = os.getenv("UPI_ID", "your-upi-id@paytm") 
+UPI_ID = os.getenv("UPI_ID", "kushalhari@slc") 
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
