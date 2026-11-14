@@ -15,7 +15,7 @@ CHANNEL_ID = os.getenv("CHANNEL_ID", "-1001603505179")
 LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-1004332636371"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run").rstrip("/")
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://misty-chelsy-mahaan-c83f919b.apps.mistral.run")
-TMDB_API_KEY = os.getenv("TMDB_API_KEY", "")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 WEBSITE_URL = os.getenv("FRONTEND_URL", "https://t.me/Hari_moviez")
 
 
