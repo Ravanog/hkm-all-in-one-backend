@@ -4,20 +4,18 @@ import random
 import string
 import requests
 from pyrogram import Client, filters
-from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
 API_ID = int(os.getenv("API_ID", "25380424"))
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_LkA")
-CHANNEL_ID = os.getenv("CHANNEL_ID", "-1001603505179")
-LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-1004332636371"))
+CHANNEL_ID = os.getenv("CHANNEL_ID", "-1002082701021")
+LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-100123456789"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run").rstrip("/")
-BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://misty-chelsy-mahaan-c83f919b.apps.mistral.run")
+BACKEND_API_URL = os.getenv("BACKEND_API_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run/api/movies")
+WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.vercel.app")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
-WEBSITE_URL = os.getenv("FRONTEND_URL", "https://t.me/Hari_moviez")
-
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -110,44 +108,6 @@ def push_message_to_backend(msg: Message) -> bool:
     res = requests.post(BACKEND_API_URL, json=payload, timeout=15)
     return res.status_code in [200, 201]
 
-
-
-# Define your website frontend URL (Change this to your actual deployed site URL)
-@app.on_message(filters.command("start") & filters.private)
-async def start_cmd(client, message: Message):
-    args = message.command
-    # Handle payment payloads if coming from checkout
-    if len(args) > 1:
-        param = args[1]
-        if param == "buy_basic":
-            await send_plan_invoice(message, "Basic VIP Plan (₹49)", "basic", 30)
-            return
-        elif param == "buy_standard":
-            await send_plan_invoice(message, "Standard VIP Plan (₹99)", "standard", 60)
-            return
-        elif param == "buy_diamond":
-            await send_plan_invoice(message, "Diamond VIP Plan (₹299/yr)", "diamond", 180)
-            return
-
-    user_info = await check_user_tier(message.from_user.id)
-    
-    # Welcome message text
-    welcome_text = (
-        f"🎬 **Welcome to HKM Providers!**\n\n"
-        f"Your Current Status: **{user_info['tier'].upper()}**\n\n"
-        f"Explore our full catalog of movies, series, and anime directly on our web portal by clicking the button below!"
-    )
-
-    # Inline keyboard button linking to your website
-    keyboard = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("🌐 Open HKM Providers Portal", url=WEBSITE_URL)]
-        ]
-    )
-
-    await message.reply_text(welcome_text, reply_markup=keyboard)
-
-
 @app.on_message(filters.chat(CHANNEL_ID) & (filters.video | filters.document))
 def auto_sync_media(client, message: Message):
     try:
@@ -173,11 +133,11 @@ async def index_channel_files(client, message: Message):
             if push_message_to_backend(msg):
                 indexed_count += 1
 
-        await status_msg.edit_text(f"✅ **Indexing Complete!**\nFiles Indexed:{indexed_count}")
+        await status_msg.edit_text(f"✅ **Indexing Complete!**\nFiles Indexed: {indexed_count}")
     except Exception as e:
         await status_msg.edit_text(f"❌ **Index Error:** `{e}`")
 
-@app.on_message(filters.command("start"))
+@app.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message: Message):
     args = message.command
     if len(args) > 1:
@@ -193,7 +153,20 @@ async def start_cmd(client, message: Message):
             return
 
     user_info = await check_user_tier(message.from_user.id)
-    await message.reply_text(f"🎬 **Welcome to HKM Providers!**\nYour Status: **{user_info['tier'].upper()}**\n\nChoose a plan on our website to get started.")
+    
+    welcome_text = (
+        f"🎬 **Welcome to HKM Providers!**\n\n"
+        f"Your Current Status: **{user_info['tier'].upper()}**\n\n"
+        f"Explore our full catalog of movies, series, and anime directly on our web portal by clicking the button below!"
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("🌐 Open HKM Providers Portal", url=WEBSITE_URL)]
+        ]
+    )
+
+    await message.reply_text(welcome_text, reply_markup=keyboard)
 
 async def send_plan_invoice(message: Message, title: str, payload_type: str, price: int):
     await app.send_invoice(
