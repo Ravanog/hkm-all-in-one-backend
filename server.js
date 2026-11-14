@@ -11,8 +11,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://anikush8310_db_user:nP
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const UPDATE_CHANNEL_ID = process.env.UPDATE_CHANNEL_ID;
 const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID;
-const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://your-vercel-site.vercel.app').replace(/\/$/, '');
-const TMDB_API_KEY = process.env.TMDB_API_KEY || '';
+const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://hkm-all-in-one-backend-q2yk.vercel.app').replace(/\/$/, '');
+const TMDB_API_KEY = process.env.TMDB_API_KEY || '6abcb6bb99fb77f33c37016a28866ed2';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('HKM Database Connected'))
