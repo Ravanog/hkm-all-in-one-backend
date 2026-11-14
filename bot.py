@@ -45,13 +45,10 @@ def fetch_tmdb_metadata(title: str, category: str):
     return poster_url, rating
 
 def parse_media_details(text: str):
-    """
-    Extracts Show/Movie Title, Category, Season, Episode, Quality, and Language.
-    """
     name_no_ext = re.sub(r'\.(mp4|mkv|avi|webm)$', '', text, flags=re.IGNORECASE)
     clean_str = re.sub(r'[._]', ' ', name_no_ext).strip()
 
-    qual_match = re.search(r'\b(4K|2160p|1080p|720p|480p)\b', clean_str, re.IGNORECASE)
+    qual_match = re.search(r'\b(4K|2160p|1080p|720p|480p|360p|240p)\b', clean_str, re.IGNORECASE)
     quality = qual_match.group(1).upper() if qual_match else "1080p"
 
     langs = re.findall(r'\b(Tamil|Hindi|Telugu|Malayalam|Kannada|English|Japanese|Korean|Multi Audio|Dual Audio)\b', clean_str, re.IGNORECASE)
@@ -72,7 +69,7 @@ def parse_media_details(text: str):
         category = "Anime" if "anime" in clean_str.lower() else "Series"
         return title, category, 1, episode, quality, language
 
-    title = re.sub(r'\b(1080p|720p|480p|2160p|4K|UHD|HDR|WEB-DL|BluRay|x264|x265|Tamil|Hindi|Telugu|English|Dual Audio|Multi Audio)\b.*', '', clean_str, flags=re.IGNORECASE).strip(" -")
+    title = re.sub(r'\b(1080p|720p|480p|360p|240p|2160p|4K|UHD|HDR|WEB-DL|BluRay|x264|x265|Tamil|Hindi|Telugu|English|Dual Audio|Multi Audio)\b.*', '', clean_str, flags=re.IGNORECASE).strip(" -")
     return title or clean_str, "Action", None, None, quality, language
 
 def push_message_to_backend(msg: Message) -> bool:
