@@ -7,7 +7,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
-# Define custom classes to prevent Pyrogram import errors
+# Define custom classes and compatibility patches for older Pyrogram versions
 class LabeledPrice:
     def __init__(self, label: str, amount: int):
         self.label = label
@@ -32,6 +32,14 @@ WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.ver
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+# Add compatibility patch for missing decorator in Pyrogram
+if not hasattr(app, 'on_pre_checkout_query'):
+    def custom_on_pre_checkout_query():
+        def decorator(func):
+            return func
+        return decorator
+    app.on_pre_checkout_query = custom_on_pre_checkout_query
 
 def generate_key(tier: str) -> str:
     prefix = tier[:3].upper()
@@ -196,10 +204,13 @@ async def send_plan_invoice(message: Message, title: str, payload_type: str, pri
 
 @app.on_pre_checkout_query()
 async def checkout_handler(client, query):
-    if hasattr(query, 'answer'):
-        await query.answer(ok=True)
-    else:
-        await client.answer_pre_checkout_query(query.id, ok=True)
+    try:
+        if hasattr(query, 'answer'):
+            await query.answer(ok=True)
+        else:
+            await client.answer_pre_checkout_query(query.id, ok=True)
+    except Exception as e:
+        print(f"Checkout Error: {e}")
 
 @app.on_message(filters.successful_payment)
 async def payment_success(client, message: Message):
