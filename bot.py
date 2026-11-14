@@ -5,6 +5,7 @@ import string
 import requests
 from pyrogram import Client, filters
 from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
 API_ID = int(os.getenv("API_ID", "25380424"))
@@ -15,6 +16,8 @@ LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-1004332636371"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://your-backend.koyeb.app").rstrip("/")
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/movies")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "")
+WEBSITE_URL = os.getenv("FRONTEND_URL", "https://t.me/Hari_moviez")
+
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -107,6 +110,44 @@ def push_message_to_backend(msg: Message) -> bool:
     res = requests.post(BACKEND_API_URL, json=payload, timeout=15)
     return res.status_code in [200, 201]
 
+
+
+# Define your website frontend URL (Change this to your actual deployed site URL)
+@app.on_message(filters.command("start") & filters.private)
+async def start_cmd(client, message: Message):
+    args = message.command
+    # Handle payment payloads if coming from checkout
+    if len(args) > 1:
+        param = args[1]
+        if param == "buy_basic":
+            await send_plan_invoice(message, "Basic VIP Plan (₹49)", "basic", 30)
+            return
+        elif param == "buy_standard":
+            await send_plan_invoice(message, "Standard VIP Plan (₹99)", "standard", 60)
+            return
+        elif param == "buy_diamond":
+            await send_plan_invoice(message, "Diamond VIP Plan (₹299/yr)", "diamond", 180)
+            return
+
+    user_info = await check_user_tier(message.from_user.id)
+    
+    # Welcome message text
+    welcome_text = (
+        f"🎬 **Welcome to HKM Providers!**\n\n"
+        f"Your Current Status: **{user_info['tier'].upper()}**\n\n"
+        f"Explore our full catalog of movies, series, and anime directly on our web portal by clicking the button below!"
+    )
+
+    # Inline keyboard button linking to your website
+    keyboard = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("🌐 Open HKM Providers Portal", url=WEBSITE_URL)]
+        ]
+    )
+
+    await message.reply_text(welcome_text, reply_markup=keyboard)
+
+
 @app.on_message(filters.chat(CHANNEL_ID) & (filters.video | filters.document))
 def auto_sync_media(client, message: Message):
     try:
@@ -132,7 +173,7 @@ async def index_channel_files(client, message: Message):
             if push_message_to_backend(msg):
                 indexed_count += 1
 
-        await status_msg.edit_text(f"✅ **Indexing Complete!**\nFiles Indexed: {indexed_count}")
+        await status_msg.edit_text(f"✅ **Indexing Complete!**\nFiles Indexed:{indexed_count}")
     except Exception as e:
         await status_msg.edit_text(f"❌ **Index Error:** `{e}`")
 
