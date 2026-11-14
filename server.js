@@ -119,7 +119,7 @@ async function postToUpdateChannel(movieDoc, episodeInfo = null) {
   }
 }
 
-// Root health check endpoint for Koyeb (Fixes SIGTERM crashes)
+// Root health check endpoint for Koyeb (Prevents SIGTERM crashes)
 app.get('/', (req, res) => {
   res.status(200).send('HKM Backend is active and running!');
 });
