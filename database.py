@@ -2,7 +2,7 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime, timedelta
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/hkmdb")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://anikush8310_db_user:nPoB0GWMD34X7aeR@cluster0.yvanywe.mongodb.net/")
 client = AsyncIOMotorClient(MONGO_URI)
 db = client.hkmdb
 users_collection = db.users
