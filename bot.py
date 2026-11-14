@@ -4,14 +4,22 @@ import random
 import string
 import requests
 from pyrogram import Client, filters
-from pyrogram.types import Message, PreCheckoutQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
 
-# Define custom LabeledPrice to prevent Pyrogram import errors
+# Define custom classes to prevent Pyrogram import errors
 class LabeledPrice:
     def __init__(self, label: str, amount: int):
         self.label = label
         self.amount = amount
+
+class PreCheckoutQuery:
+    def __init__(self, id: str, from_user, currency: str, total_amount: int, payload: str):
+        self.id = id
+        self.from_user = from_user
+        self.currency = currency
+        self.total_amount = total_amount
+        self.payload = payload
 
 API_ID = int(os.getenv("API_ID", "25380424"))
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
@@ -187,8 +195,11 @@ async def send_plan_invoice(message: Message, title: str, payload_type: str, pri
     )
 
 @app.on_pre_checkout_query()
-async def checkout_handler(client, query: PreCheckoutQuery):
-    await query.answer(ok=True)
+async def checkout_handler(client, query):
+    if hasattr(query, 'answer'):
+        await query.answer(ok=True)
+    else:
+        await client.answer_pre_checkout_query(query.id, ok=True)
 
 @app.on_message(filters.successful_payment)
 async def payment_success(client, message: Message):
