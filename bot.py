@@ -4,8 +4,14 @@ import random
 import string
 import requests
 from pyrogram import Client, filters
-from pyrogram.types import LabeledPrice, Message, PreCheckoutQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import Message, PreCheckoutQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from database import set_user_vip_tier, save_vip_key, check_user_tier
+
+# Define custom LabeledPrice to prevent Pyrogram import errors
+class LabeledPrice:
+    def __init__(self, label: str, amount: int):
+        self.label = label
+        self.amount = amount
 
 API_ID = int(os.getenv("API_ID", "25380424"))
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
@@ -13,7 +19,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_L
 CHANNEL_ID = os.getenv("CHANNEL_ID", "-1002082701021")
 LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-100123456789"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run").rstrip("/")
-BACKEND_API_URL = os.getenv("BACKEND_API_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run/api/movies")
+BACKEND_API_URL = os.getenv("BACKEND_API_URL", f"{STREAM_SERVER_URL}/api/movies")
 WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.vercel.app")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
@@ -143,13 +149,13 @@ async def start_cmd(client, message: Message):
     if len(args) > 1:
         param = args[1]
         if param == "buy_basic":
-            await send_plan_invoice(message, "Basic VIP Plan (₹49)", "basic", 30)
+            await send_plan_invoice(message, "Basic VIP Plan (₹49)", "basic", 49)
             return
         elif param == "buy_standard":
-            await send_plan_invoice(message, "Standard VIP Plan (₹99)", "standard", 60)
+            await send_plan_invoice(message, "Standard VIP Plan (₹99)", "standard", 99)
             return
         elif param == "buy_diamond":
-            await send_plan_invoice(message, "Diamond VIP Plan (₹299/yr)", "diamond", 180)
+            await send_plan_invoice(message, "Diamond VIP Plan (₹299/yr)", "diamond", 299)
             return
 
     user_info = await check_user_tier(message.from_user.id)
