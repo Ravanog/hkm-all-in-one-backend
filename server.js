@@ -119,6 +119,11 @@ async function postToUpdateChannel(movieDoc, episodeInfo = null) {
   }
 }
 
+// Root health check endpoint for Koyeb (Fixes SIGTERM crashes)
+app.get('/', (req, res) => {
+  res.status(200).send('HKM Backend is active and running!');
+});
+
 app.get('/api/movies', async (req, res) => {
   try {
     const movies = await Movie.find().sort({ createdAt: -1 });
@@ -295,6 +300,7 @@ app.post('/api/user/redeem-key', async (req, res) => {
 
 const botProcess = spawn('python3', ['bot.py']);
 botProcess.stdout.on('data', (d) => console.log(`[BOT]: ${d}`));
+botProcess.stderr.on('data', (d) => console.error(`[BOT ERROR]: ${d}`));
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`HKM Express Server running on port ${PORT}`));
