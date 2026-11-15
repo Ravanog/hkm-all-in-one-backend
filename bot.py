@@ -18,7 +18,7 @@ WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.ver
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 UPI_ID = "kushalhari@slc"
-ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "123456789")) # Replace with your numeric Telegram user ID if needed
+ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "7253187871")) # Your Telegram ID from the screenshot
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -260,7 +260,6 @@ async def user_submissions(client, message: Message):
     if any(keyword in text_content.lower() for keyword in ["upi", "paid", "payment", "transaction", "utr", "ref", "screenshot", "gpay", "phonepe", "paytm"]) or message.photo:
         user = message.from_user
         
-        # Create approval buttons embedded right inside the log message in your log channel
         approval_keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("✅ Approve (Standard)", callback_data=f"app_{user.id}_standard"),
@@ -299,7 +298,17 @@ async def user_submissions(client, message: Message):
 
 @app.on_callback_query()
 async def admin_approval_callback(client, query: CallbackQuery):
-    if query.from_user.id != ADMIN_USER_ID:
+    # Dynamically verify if the user clicking the button is either the main ADMIN_USER_ID or an admin of the LOG_CHANNEL
+    is_admin = (query.from_user.id == ADMIN_USER_ID)
+    if not is_admin:
+        try:
+            member = await client.get_chat_member(LOG_CHANNEL_ID, query.from_user.id)
+            if member.status in ["creator", "administrator"]:
+                is_admin = True
+        except Exception:
+            pass
+
+    if not is_admin:
         await query.answer("❌ Only admins can perform this action.", show_alert=True)
         return
 
@@ -315,7 +324,6 @@ async def admin_approval_callback(client, query: CallbackQuery):
             await save_vip_key(vip_key, tier, target_user_id)
             await set_user_vip_tier(target_user_id, tier, duration_days=30)
 
-            # Notify user with key
             try:
                 await client.send_message(
                     chat_id=target_user_id,
@@ -327,7 +335,6 @@ async def admin_approval_callback(client, query: CallbackQuery):
             except Exception:
                 pass
 
-            # Update admin log message
             new_caption = (query.message.caption or query.message.text) + f"\n\n✅ **STATUS: APPROVED ({tier.upper()})**\n🔑 Key Generated: `{vip_key}`"
             if query.message.photo:
                 await query.message.edit_caption(caption=new_caption)
@@ -336,7 +343,6 @@ async def admin_approval_callback(client, query: CallbackQuery):
             await query.answer("✅ Payment approved and key sent to user!")
 
         elif action == "rej":
-            # Notify user of rejection
             try:
                 await client.send_message(
                     chat_id=target_user_id,
@@ -345,7 +351,6 @@ async def admin_approval_callback(client, query: CallbackQuery):
             except Exception:
                 pass
 
-            # Update admin log message
             new_caption = (query.message.caption or query.message.text) + "\n\n❌ **STATUS: REJECTED BY ADMIN**"
             if query.message.photo:
                 await query.message.edit_caption(caption=new_caption)
