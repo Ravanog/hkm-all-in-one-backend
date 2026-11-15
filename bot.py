@@ -8,7 +8,7 @@ API_ID = int(os.getenv("API_ID", "25380424"))  # Replace with your Telegram API 
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_LkA")
 MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://anikush8310_db_user:nPoB0GWMD34X7aeR@cluster0.yvanywe.mongodb.net/")
-ADMIN_USER_ID = 836351544  # Hardcoded verified Admin ID
+ADMIN_USER_ID = [836351544, 7253187871]  # Hardcoded verified Admin ID
 
 app = Client("hkm_providers_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
