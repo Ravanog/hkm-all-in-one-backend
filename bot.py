@@ -11,13 +11,16 @@ API_ID = int(os.getenv("API_ID", "25380424"))
 API_HASH = os.getenv("API_HASH", "2c434b1c9d15acef0b9ef44b6b96f6c0")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "9156008903:AAHMruoUUSyk3eLsQaqk4WOD3F-suEC_LkA")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "-1002082701021")
-LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-1004332636371"))
+LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID", "-100123456789"))
 STREAM_SERVER_URL = os.getenv("STREAM_SERVER_URL", "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run").rstrip("/")
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", f"{STREAM_SERVER_URL}/api/movies")
 WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.vercel.app")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
 UPI_ID = "kushalhari@slc"
+
+# Put your exact Telegram User ID here so only you can perform admin actions (/delete, /grant, etc.)
+ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "7253187871")) # Replace with your numeric Telegram user ID
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -124,10 +127,17 @@ def auto_sync_media(client, message: Message):
 
 @app.on_message(filters.command("index") & filters.private)
 async def index_channel_files(client, message: Message):
+    if message.from_user.id != ADMIN_USER_ID:
+        return
     await message.reply_text("ℹ️ **Note:** Standard Telegram bots cannot read full channel history via `/index` due to Telegram restrictions.\n\n✨ **Better Way:** Just post or forward your movies into your storage channel, and they will **automatically sync** to your website instantly!")
 
+# --- ADMIN ONLY: DELETE COMMAND ---
 @app.on_message(filters.command("delete") & filters.private)
 async def delete_movie_cmd(client, message: Message):
+    if message.from_user.id != ADMIN_USER_ID:
+        await message.reply_text("❌ You are not authorized to use this command.")
+        return
+
     args = message.command
     if len(args) < 2:
         await message.reply_text("❌ **Usage:** `/delete <Movie Title or ID>`")
@@ -160,8 +170,59 @@ async def delete_movie_cmd(client, message: Message):
     except Exception as e:
         await message.reply_text(f"❌ **Error:** `{e}`")
 
+# --- ADMIN ONLY: GRANT PREMIUM COMMAND (/grant <user_id> <tier>) ---
+@app.on_message(filters.command("grant") & filters.private)
+async def grant_premium_cmd(client, message: Message):
+    if message.from_user.id != ADMIN_USER_ID:
+        await message.reply_text("❌ You are not authorized to use this command.")
+        return
+
+    args = message.command
+    if len(args) < 3:
+        await message.reply_text("❌ **Usage:** `/grant <Telegram_User_ID> <basic/standard/diamond>`")
+        return
+
+    try:
+        target_user_id = int(args[1])
+        tier = args[2].lower()
+        if tier not in ["basic", "standard", "diamond", "free"]:
+            await message.reply_text("❌ Invalid tier. Use: `basic`, `standard`, `diamond`, or `free`")
+            return
+
+        vip_key = generate_key(tier) if tier != "free" else "FREE-PLAN"
+        if tier != "free":
+            await save_vip_key(vip_key, tier, target_user_id)
+        
+        await set_user_vip_tier(target_user_id, tier, duration_days=30)
+        await message.reply_text(f"✅ **Successfully updated user `{target_user_id}` to {tier.upper()} tier!**\nGenerated Key: `{vip_key}`")
+        
+        try:
+            await client.send_message(
+                chat_id=target_user_id,
+                text=f"🎉 **Your account has been upgraded to {tier.upper()} VIP Plan by Admin!**\nEnjoy premium streaming on our portal."
+            )
+        except Exception:
+            pass
+    except Exception as e:
+        await message.reply_text(f"❌ **Error:** `{e}`")
+
 @app.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message: Message):
+    user = message.from_user
+    
+    # Send user log to LOG_CHANNEL on every /start
+    try:
+        log_text = (
+            f"🚀 **User Started Bot (`/start`)**\n\n"
+            f"👤 **Name:** {user.first_name} {user.last_name or ''}\n"
+            f"🔗 **Username:** @{user.username or 'None'}\n"
+            f"🆔 **User ID:** `{user.id}`\n"
+            f"🌐 **Profile Link:** tg://openuser?id={user.id}"
+        )
+        await client.send_message(chat_id=LOG_CHANNEL_ID, text=log_text)
+    except Exception as e:
+        print(f"Start Log Error: {e}")
+
     args = message.command
     if len(args) > 1:
         param = args[1]
@@ -183,7 +244,7 @@ async def start_cmd(client, message: Message):
             await message.reply_text(text, reply_markup=keyboard)
             return
 
-    user_info = await check_user_tier(message.from_user.id)
+    user_info = await check_user_tier(user.id)
     
     welcome_text = (
         f"🎬 **Welcome to HKM Providers!**\n\n"
@@ -191,7 +252,6 @@ async def start_cmd(client, message: Message):
         f"Explore our full catalog of movies, series, and anime directly on our web portal by clicking the button below!"
     )
 
-    # Only website link button for normal start
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🌐 Open HKM Portal", url=WEBSITE_URL)]
     ])
@@ -210,7 +270,7 @@ async def user_submissions(client, message: Message):
             f"🔔 **NEW UPI PAYMENT SUBMISSION**\n\n"
             f"👤 **User:** @{user.username or 'None'} (`{user.id}`)\n"
             f"📝 **Note/Caption:** {text_content}\n\n"
-            f"*(Verify payment in your UPI app and generate key for user)*"
+            f"*(Admin: Use `/grant {user.id} <tier>` to activate premium)*"
         )
         try:
             await client.send_message(chat_id=LOG_CHANNEL_ID, text=forward_text)
