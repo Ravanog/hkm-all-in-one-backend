@@ -62,66 +62,9 @@ async function resolvePoster(title, category, providedPoster) {
   return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600';
 }
 
-async function postToUpdateChannel(movieDoc, episodeInfo = null) {
-  if (!BOT_TOKEN || !UPDATE_CHANNEL_ID) return;
-
-  const directLink = `${FRONTEND_URL}/?watch=${movieDoc._id}`;
-  const isEpisodic = episodeInfo !== null;
-  const headerText = isEpisodic
-    ? `🆕 <b>RECENTLY ADDED ${movieDoc.category.toUpperCase()} EPISODE</b>`
-    : `🎬 <b>RECENTLY ADDED ${movieDoc.category.toUpperCase()}</b>`;
-
-  const episodeLine = isEpisodic
-    ? `» <b>Episode:</b> Season ${episodeInfo.season} • Episode ${episodeInfo.episode}\n`
-    : '';
-
-  const accessBadge = movieDoc.isPremium ? '👑 VIP Premium' : '🆓 Free Access';
-
-  const caption =
-    `${headerText}\n\n` +
-    `» <b>Title:</b> ${movieDoc.title}\n` +
-    `${episodeLine}` +
-    `» <b>Rating:</b> ⭐ ${movieDoc.rating || 'N/A'}/10\n` +
-    `» <b>Language:</b> 🌐 ${movieDoc.language || 'Multi Audio'}\n` +
-    `» <b>Quality:</b> 🎞️ ${movieDoc.quality || '1080p'}\n` +
-    `» <b>Uploaded By:</b> 💎 <b>${movieDoc.credit || 'Hari_Moviez'}</b>\n` +
-    `» <b>Access:</b> ${accessBadge}\n\n` +
-    `» <b>Watch / Download Link:</b>\n${directLink}`;
-
-  const payload = {
-    chat_id: UPDATE_CHANNEL_ID,
-    photo: movieDoc.posterUrl,
-    caption: caption,
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: '▶️ Watch & Download Now', url: directLink }]
-      ]
-    }
-  };
-
-  try {
-    const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const tgData = await tgRes.json();
-    if (!tgData.ok) {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: UPDATE_CHANNEL_ID, text: caption, parse_mode: 'HTML', reply_markup: payload.reply_markup })
-      });
-    }
-  } catch (err) {
-    console.error('Update Broadcast Error:', err.message);
-  }
-}
-
 // Root health check endpoint for Koyeb
 app.get('/', (req, res) => {
-  res.status(200).send('HKM Backend is active and running!');
+  res.status(200).send('HKM Backend & Bot System is active and running!');
 });
 
 app.get('/api/movies', async (req, res) => {
@@ -139,35 +82,6 @@ app.post('/api/movies/:id/view', async (req, res) => {
     res.json({ success: true, views: movie ? movie.views : 0 });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/request', async (req, res) => {
-  try {
-    const { title, category, language, seasonEpisode, userName, telegramUsername, userTier } = req.body;
-    if (!title || !title.trim()) return res.status(400).json({ success: false, message: 'Title required.' });
-    if (!BOT_TOKEN || !LOG_CHANNEL_ID) return res.status(500).json({ success: false, message: 'Log channel not configured.' });
-
-    const logText =
-      `📩 <b>NEW CONTENT REQUEST</b>\n\n` +
-      `🎬 <b>Title:</b> ${title.trim()}\n` +
-      `📂 <b>Category:</b> ${category || 'Movie'}\n` +
-      `🌐 <b>Language:</b> ${language || 'Any'}\n` +
-      `${seasonEpisode ? `🔢 <b>Season / Ep:</b> ${seasonEpisode}\n` : ''}` +
-      `\n👤 <b>User Details:</b>\n` +
-      `• <b>Name:</b> ${userName || 'Guest'}\n` +
-      `• <b>Telegram:</b> ${telegramUsername ? (telegramUsername.startsWith('@') ? telegramUsername : '@' + telegramUsername) : 'Not Provided'}\n` +
-      `• <b>Plan:</b> ${(userTier || 'free').toUpperCase()}`;
-
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: LOG_CHANNEL_ID, text: logText, parse_mode: 'HTML' })
-    });
-
-    res.json({ success: true, message: 'Request sent!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -204,7 +118,6 @@ app.post('/api/movies', async (req, res) => {
         }
 
         await existingShow.save();
-        await postToUpdateChannel(existingShow, epObj);
         return res.status(200).json({ success: true, movie: existingShow });
       } else {
         const newShow = new Movie({
@@ -221,7 +134,6 @@ app.post('/api/movies', async (req, res) => {
           episodes: [epObj]
         });
         await newShow.save();
-        await postToUpdateChannel(newShow, epObj);
         return res.status(201).json({ success: true, movie: newShow });
       }
     }
@@ -238,7 +150,6 @@ app.post('/api/movies', async (req, res) => {
       existingMovie.streamUrl = streamUrl;
       existingMovie.downloadUrl = downloadUrl;
       await existingMovie.save();
-      await postToUpdateChannel(existingMovie, null);
       return res.status(200).json({ success: true, movie: existingMovie });
     }
 
@@ -255,63 +166,36 @@ app.post('/api/movies', async (req, res) => {
       downloadUrl
     });
     await newMovie.save();
-    await postToUpdateChannel(newMovie, null);
     res.status(201).json({ success: true, movie: newMovie });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Delete movie and poster by ID
 app.delete('/api/movies/:id', async (req, res) => {
   try {
     const deletedMovie = await Movie.findByIdAndDelete(req.params.id);
     if (!deletedMovie) return res.status(404).json({ success: false, message: 'Movie not found' });
-    res.json({ success: true, message: 'Movie and poster deleted successfully' });
+    res.json({ success: true, message: 'Movie deleted successfully' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-app.get('/api/download/:id', async (req, res) => {
-  try {
-    const movie = await Movie.findById(req.params.id);
-    if (!movie) return res.status(404).send('Movie not found');
-    res.redirect(movie.downloadUrl);
-  } catch (err) {
-    res.status(500).send('Download error');
-  }
-});
-
-app.post('/api/user/redeem-key', async (req, res) => {
-  try {
-    const { key } = req.body;
-    if (!key) return res.status(400).json({ success: false, message: "Key required." });
-
-    const keyDoc = await db.collection('vip_keys').findOne({ key: key.trim(), isRedeemed: false });
-    if (!keyDoc) return res.status(400).json({ success: false, message: "Invalid or redeemed key." });
-
-    await db.collection('vip_keys').updateOne({ key: key.trim() }, { $set: { isRedeemed: true, redeemedAt: new Date() } });
-
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30);
-    const isVIP = ['standard', 'diamond'].includes(keyDoc.tier);
-
-    await db.collection('users').updateOne(
-      { telegramId: keyDoc.telegramId },
-      { $set: { tier: keyDoc.tier, isVIP: isVIP, vipExpiry: expiryDate } },
-      { upsert: true }
-    );
-
-    res.json({ success: true, tier: keyDoc.tier, message: `Activated ${keyDoc.tier.toUpperCase()} Plan!` });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
+// Spawn Python Bot concurrently and pipe outputs
 const botProcess = spawn('python3', ['bot.py']);
-botProcess.stdout.on('data', (d) => console.log(`[BOT]: ${d}`));
-botProcess.stderr.on('data', (d) => console.error(`[BOT ERROR]: ${d}`));
+
+botProcess.stdout.on('data', (d) => {
+  console.log(`[BOT OUT]: ${d.toString().trim()}`);
+});
+
+botProcess.stderr.on('data', (d) => {
+  console.error(`[BOT ERR]: ${d.toString().trim()}`);
+});
+
+botProcess.on('close', (code) => {
+  console.log(`[BOT]: Child process exited with code ${code}`);
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`HKM Express Server running on port ${PORT}`));
