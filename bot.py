@@ -15,7 +15,7 @@ BACKEND_API_URL = os.getenv("BACKEND_API_URL", f"{STREAM_SERVER_URL}/api/movies"
 WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.vercel.app")
 
 UPI_ID = "kushalhari@slc"
-ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "7253187871"))
+ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "836351544"))
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
