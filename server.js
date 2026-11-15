@@ -8,17 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://anikush8310_db_user:nPoB0GWMD34X7aeR@cluster0.yvanywe.mongodb.net';
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const UPDATE_CHANNEL_ID = process.env.UPDATE_CHANNEL_ID;
-const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID;
-const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://hkm-all-in-one-backend-q2yk.vercel.app').replace(/\/$/, '');
 const TMDB_API_KEY = process.env.TMDB_API_KEY || '6abcb6bb99fb77f33c37016a28866ed2';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('HKM Database Connected'))
   .catch(err => console.error('MongoDB Error:', err));
-
-const db = mongoose.connection;
 
 const episodeSchema = new mongoose.Schema({
   season: { type: Number, default: 1 },
@@ -62,7 +56,6 @@ async function resolvePoster(title, category, providedPoster) {
   return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600';
 }
 
-// Root health check endpoint for Koyeb
 app.get('/', (req, res) => {
   res.status(200).send('HKM Backend & Bot System is active and running!');
 });
@@ -182,20 +175,11 @@ app.delete('/api/movies/:id', async (req, res) => {
   }
 });
 
-// Spawn Python Bot concurrently and pipe outputs
+// Spawn Python Bot concurrently
 const botProcess = spawn('python3', ['bot.py']);
-
-botProcess.stdout.on('data', (d) => {
-  console.log(`[BOT OUT]: ${d.toString().trim()}`);
-});
-
-botProcess.stderr.on('data', (d) => {
-  console.error(`[BOT ERR]: ${d.toString().trim()}`);
-});
-
-botProcess.on('close', (code) => {
-  console.log(`[BOT]: Child process exited with code ${code}`);
-});
+botProcess.stdout.on('data', (d) => console.log(`[BOT OUT]: ${d.toString().trim()}`));
+botProcess.stderr.on('data', (d) => console.error(`[BOT ERR]: ${d.toString().trim()}`));
+botProcess.on('close', (code) => console.log(`[BOT]: Child process exited with code ${code}`));
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`HKM Express Server running on port ${PORT}`));
