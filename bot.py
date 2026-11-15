@@ -17,8 +17,7 @@ BACKEND_API_URL = os.getenv("BACKEND_API_URL", f"{STREAM_SERVER_URL}/api/movies"
 WEBSITE_URL = os.getenv("FRONTEND_URL", "https://hkm-all-in-one-backend-q2yk.vercel.app")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "6abcb6bb99fb77f33c37016a28866ed2")
 
-# Set your UPI ID here for manual/QR payments
-UPI_ID = os.getenv("UPI_ID", "kushalhari@slc") 
+UPI_ID = "kushalhari@slc"
 
 app = Client("hkm_unified_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -125,24 +124,7 @@ def auto_sync_media(client, message: Message):
 
 @app.on_message(filters.command("index") & filters.private)
 async def index_channel_files(client, message: Message):
-    args = message.command
-    limit = int(args[1]) if len(args) > 1 and args[1].isdigit() else 50
-    status_msg = await message.reply_text(f"🔄 **Indexing last {limit} messages from channel...**")
-
-    indexed_count = 0
-    try:
-        messages_to_process = []
-        async for msg in client.get_chat_history(int(CHANNEL_ID), limit=limit):
-            if msg.video or msg.document:
-                messages_to_process.append(msg)
-
-        for msg in reversed(messages_to_process):
-            if push_message_to_backend(msg):
-                indexed_count += 1
-
-        await status_msg.edit_text(f"✅ **Indexing Complete!**\nFiles Indexed: {indexed_count}")
-    except Exception as e:
-        await status_msg.edit_text(f"❌ **Index Error:** `{e}`")
+    await message.reply_text("ℹ️ **Note:** Standard Telegram bots cannot read full channel history via `/index` due to Telegram restrictions.\n\n✨ **Better Way:** Just post or forward your movies into your storage channel, and they will **automatically sync** to your website instantly!")
 
 @app.on_message(filters.command("delete") & filters.private)
 async def delete_movie_cmd(client, message: Message):
@@ -187,18 +169,16 @@ async def start_cmd(client, message: Message):
             tier_name = param.replace("buy_", "").upper()
             price = 49 if param == "buy_basic" else (99 if param == "buy_standard" else 299)
             
-            upi_url = f"upi://pay?pa={UPI_ID}&pn=HKM%20Providers&am={price}&cu=INR&tn=HKM%20{tier_name}%20Plan"
-            
             text = (
                 f"💎 **Upgrade to {tier_name} VIP Plan**\n\n"
-                f"💰 **Amount:** ₹{price}\n"
+                f"💰 **Amount:** `₹{price}`\n"
                 f"📱 **UPI ID:** `{UPI_ID}`\n\n"
-                f"1. Click the button below to pay via UPI app, or scan/pay manually to the UPI ID above.\n"
-                f"2. After payment, send your **Payment Screenshot / Transaction ID** here to get your VIP Key!"
+                f"1. Open any UPI app (GPay, PhonePe, Paytm, etc.) and send **₹{price}** to:\n"
+                f"👉 `{UPI_ID}`\n\n"
+                f"2. After payment, send your **Transaction ID / Screenshot** right here in this chat to receive your activation key instantly!"
             )
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("📲 Pay via UPI App", url=upi_url)],
-                [InlineKeyboardButton("🌐 Open Portal", url=WEBSITE_URL)]
+                [InlineKeyboardButton("🌐 Open HKM Portal", url=WEBSITE_URL)]
             ])
             await message.reply_text(text, reply_markup=keyboard)
             return
@@ -208,58 +188,19 @@ async def start_cmd(client, message: Message):
     welcome_text = (
         f"🎬 **Welcome to HKM Providers!**\n\n"
         f"Your Current Status: **{user_info['tier'].upper()}**\n\n"
-        f"Explore our full catalog of movies, series, and anime directly on our web portal or choose a VIP plan!"
+        f"Explore our full catalog of movies, series, and anime directly on our web portal by clicking the button below!"
     )
 
+    # Only website link button for normal start
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🌐 Open HKM Portal", url=WEBSITE_URL)],
-        [
-            InlineKeyboardButton("⚡ Basic (₹49)", callback_data="plan_basic"),
-            InlineKeyboardButton("🔥 Standard (₹99)", callback_data="plan_standard"),
-            InlineKeyboardButton("👑 Diamond (₹299)", callback_data="plan_diamond")
-        ]
+        [InlineKeyboardButton("🌐 Open HKM Portal", url=WEBSITE_URL)]
     ])
 
     await message.reply_text(welcome_text, reply_markup=keyboard)
 
-@app.on_callback_query()
-async def callback_handler(client, callback_query):
-    data = callback_query.data
-    if data.startswith("plan_"):
-        tier = data.replace("plan_", "")
-        tier_name = tier.upper()
-        price = 49 if tier == "basic" else (99 if tier == "standard" else 299)
-        upi_url = f"upi://pay?pa={UPI_ID}&pn=HKM%20Providers&am={price}&cu=INR&tn=HKM%20{tier_name}%20Plan"
-        
-        text = (
-            f"💎 **Upgrade to {tier_name} VIP Plan**\n\n"
-            f"💰 **Amount:** ₹{price}\n"
-            f"📱 **UPI ID:** `{UPI_ID}`\n\n"
-            f"1. Pay using any UPI app (GPay, PhonePe, Paytm).\n"
-            f"2. Send your **Transaction ID / Screenshot** in this chat to receive your activation key."
-        )
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("📲 Pay via UPI App", url=upi_url)],
-            [InlineKeyboardButton("🔙 Back to Menu", callback_data="menu_home")]
-        ])
-        await callback_query.message.edit_text(text, reply_markup=keyboard)
-    elif data == "menu_home":
-        await callback_query.message.edit_text(
-            "🎬 **Welcome to HKM Providers!**\n\nChoose an option below:",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🌐 Open HKM Portal", url=WEBSITE_URL)],
-                [
-                    InlineKeyboardButton("⚡ Basic (₹49)", callback_data="plan_basic"),
-                    InlineKeyboardButton("🔥 Standard (₹99)", callback_data="plan_standard"),
-                    InlineKeyboardButton("👑 Diamond (₹299)", callback_data="plan_diamond")
-                ]
-            ])
-        )
-
 @app.on_message(filters.photo | filters.document | filters.text & filters.private)
 async def user_submissions(client, message: Message):
-    # If user sends screenshot or text message about payment, forward to log channel for admin review
-    if message.chat.id == int(LOG_CHANNEL_ID) or message.from_user.id == int(LOG_CHANNEL_ID):
+    if not message.from_user or message.chat.id == int(LOG_CHANNEL_ID):
         return
         
     text_content = message.text or message.caption or ""
@@ -269,7 +210,7 @@ async def user_submissions(client, message: Message):
             f"🔔 **NEW UPI PAYMENT SUBMISSION**\n\n"
             f"👤 **User:** @{user.username or 'None'} (`{user.id}`)\n"
             f"📝 **Note/Caption:** {text_content}\n\n"
-            f"*(Verify payment in your UPI app and generate key for user using database/admin command)*"
+            f"*(Verify payment in your UPI app and generate key for user)*"
         )
         try:
             await client.send_message(chat_id=LOG_CHANNEL_ID, text=forward_text)
