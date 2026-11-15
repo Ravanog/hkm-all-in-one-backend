@@ -1,8 +1,7 @@
 import os
-import re
+import requests
 import random
 import string
-import requests
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from database import set_user_vip_tier, save_vip_key, check_user_tier
@@ -25,6 +24,51 @@ def generate_key(tier: str) -> str:
     random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"HKM-{prefix}-{random_str}"
 
+# --- MANUAL MOVIE ADDITION COMMAND FOR ADMIN ---
+@app.on_message(filters.command("addmovie") & filters.private)
+async def add_movie_cmd(client, message: Message):
+    if message.from_user.id != ADMIN_USER_ID:
+        await message.reply_text("❌ You are not authorized to use this command.")
+        return
+
+    args = message.command
+    if len(args) < 2:
+        await message.reply_text(
+            "❌ **Usage:**\n"
+            "`/addmovie Title | Category | StreamURL | DownloadURL`\n\n"
+            "*Example:* `/addmovie Leo | Action | https://link.com/stream | https://link.com/download`"
+        )
+        return
+
+    content = " ".join(args[1:])
+    parts = [p.strip() for p in content.split("|")]
+
+    if len(parts) < 3:
+        await message.reply_text("❌ Please provide at least Title, Category, and StreamURL separated by `|`.")
+        return
+
+    title = parts[0]
+    category = parts[1]
+    stream_url = parts[2]
+    download_url = parts[3] if len(parts) > 3 else stream_url
+
+    payload = {
+        "title": title,
+        "category": category,
+        "streamUrl": stream_url,
+        "downloadUrl": download_url,
+        "credit": "Hari_Moviez"
+    }
+
+    try:
+        res = requests.post(BACKEND_API_URL, json=payload, timeout=15)
+        if res.status_code in [200, 201]:
+            await message.reply_text(f"✅ **Successfully added movie to site:** `{title}`")
+        else:
+            await message.reply_text("❌ Failed to add movie to backend database.")
+    except Exception as e:
+        await message.reply_text(f"❌ **Error:** `{e}`")
+
 @app.on_message(filters.command("delete") & filters.private)
 async def delete_movie_cmd(client, message: Message):
     if message.from_user.id != ADMIN_USER_ID:
@@ -45,7 +89,6 @@ async def delete_movie_cmd(client, message: Message):
 
         movies = res.json()
         target_movie = None
-
         for m in movies:
             if m["_id"] == query or m["title"].lower() == query.lower():
                 target_movie = m
@@ -57,7 +100,7 @@ async def delete_movie_cmd(client, message: Message):
 
         delete_res = requests.delete(f"{BACKEND_API_URL}/{target_movie['_id']}", timeout=10)
         if delete_res.status_code == 200:
-            await message.reply_text(f"✅ **Successfully deleted movie and poster:** {target_movie['title']}")
+            await message.reply_text(f"✅ **Successfully deleted movie:** {target_movie['title']}")
         else:
             await message.reply_text("❌ Failed to delete movie from database.")
     except Exception as e:
@@ -153,7 +196,7 @@ async def user_submissions(client, message: Message):
         return
         
     text_content = message.text or message.caption or ""
-    if any(keyword in text_content.lower() for keyword in ["upi", "paid", "payment", "transaction", "utr", "ref", "screenshot", "gpay", "phonepe", "paytm"]) or message.photo:
+    if any(keyword in text_content.lower() for keyword in ["upi", "paid", "payment", "transaction", "utr", "ref", "screenshot", "gpay", "phonepe", "paytm", "39", "49", "99", "299"]) or message.photo:
         user = message.from_user
         
         approval_keyboard = InlineKeyboardMarkup([
