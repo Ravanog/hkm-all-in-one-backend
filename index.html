@@ -24,29 +24,44 @@
 <body class="bg-amber-50/40 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased pb-24 transition-colors duration-300">
 
   <!-- Navbar -->
-  <nav class="bg-white/85 dark:bg-slate-900/85 border-b border-amber-200/70 dark:border-slate-800/80 sticky top-0 z-50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-      <div class="flex items-center gap-3 cursor-pointer" onclick="filterCategory('all')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/25">
-          <i class="fa-solid fa-play text-slate-950 text-lg ml-0.5"></i>
+  <nav class="bg-white/90 dark:bg-slate-900/90 border-b border-amber-200/70 dark:border-slate-800/80 sticky top-0 z-50 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      
+      <!-- Top Row: Brand & Action Buttons -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="resetSearch()">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/25">
+            <i class="fa-solid fa-play text-slate-950 text-base sm:text-lg ml-0.5"></i>
+          </div>
+          <span class="text-base sm:text-xl font-extrabold tracking-wider text-slate-900 dark:text-white uppercase">HKM <span class="text-amber-500">PROV</span></span>
         </div>
-        <span class="text-lg sm:text-xl font-extrabold tracking-wider text-slate-900 dark:text-white uppercase">HKM <span class="text-amber-500">PROVIDERS</span></span>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/25 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-crown"></i><span>PREMIUM</span>
+          </button>
+
+          <button onclick="toggleMenuDrawer()" class="bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl border border-amber-400/40 dark:border-amber-500/30 transition flex items-center justify-center">
+            <i id="menuIcon" class="fa-solid fa-bars text-base"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button onclick="openPremiumModal()" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/25 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-crown"></i><span id="premiumBtnText">PREMIUM</span>
-        </button>
-
-        <button onclick="toggleMenuDrawer()" class="bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl border border-amber-400/40 dark:border-amber-500/30 transition flex items-center justify-center">
-          <i id="menuIcon" class="fa-solid fa-bars text-base"></i>
-        </button>
+      <!-- Search Bar Row -->
+      <div class="mt-3 relative w-full">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-amber-500">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </span>
+        <input type="text" id="advSearchInput" oninput="advancedSearchWithSpellCheck()" placeholder="Search movies, series, or uploader..." 
+          class="w-full bg-amber-50/70 dark:bg-slate-950 border border-amber-200/80 dark:border-slate-800 pl-10 pr-4 py-2.5 rounded-xl text-xs font-medium focus:outline-none focus:border-amber-500 transition">
+        <div id="spellCheckFeedback" class="hidden absolute left-2 -bottom-5 text-[10px] text-amber-500 font-medium italic"></div>
       </div>
+
     </div>
   </nav>
 
   <!-- Menu Drawer -->
-  <div id="menuDrawer" class="hidden fixed inset-x-0 top-20 bg-white/95 dark:bg-slate-900/95 border-b border-amber-200 dark:border-slate-800 shadow-2xl z-40 backdrop-blur-2xl">
+  <div id="menuDrawer" class="hidden fixed inset-x-0 top-[125px] bg-white/95 dark:bg-slate-900/95 border-b border-amber-200 dark:border-slate-800 shadow-2xl z-40 backdrop-blur-2xl">
     <div class="max-w-7xl mx-auto px-4 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
       <button onclick="toggleTheme(); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
         <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i id="drawerThemeIcon" class="fa-solid fa-moon"></i></div>
@@ -60,10 +75,9 @@
 
       <button onclick="toggleModal('requestModal'); toggleMenuDrawer();" class="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
         <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></div>
-        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Request Content</p><p class="text-[10px] text-slate-500">Ask for movies, series or anime</p></div>
+        <div><p class="font-bold text-xs text-slate-900 dark:text-white">Request Content</p><p class="text-[10px] text-slate-500">Ask for movies or series</p></div>
       </button>
 
-      <!-- Admin-Only Add Content Button (Hidden by default) -->
       <button id="adminMenuBtn" onclick="toggleModal('adminModal'); toggleMenuDrawer();" class="hidden flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/70 border border-amber-200/60 dark:border-slate-700 text-left hover:border-amber-500 transition">
         <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-plus"></i></div>
         <div><p class="font-bold text-xs text-slate-900 dark:text-white">Add Content</p><p class="text-[10px] text-slate-500">Upload movie or series episode</p></div>
@@ -73,7 +87,7 @@
 
   <!-- Banner Slideshow -->
   <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-    <div id="bannerCarousel" class="relative w-full h-[380px] sm:h-[440px] rounded-3xl overflow-hidden shadow-2xl border border-amber-200/60 dark:border-slate-800/80 group"></div>
+    <div id="bannerCarousel" class="relative w-full h-[320px] sm:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-amber-200/60 dark:border-slate-800/80 group"></div>
   </header>
 
   <!-- Top 5 Trending -->
@@ -86,13 +100,13 @@
     <div id="top5Grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
   </section>
 
-  <!-- Categories Bar -->
-  <div class="bg-white/70 dark:bg-slate-900/50 border-y border-amber-200/70 dark:border-slate-800/80 py-4 px-4 sticky top-20 z-30 backdrop-blur-md">
+  <!-- Quick Category Tabs (Anime Removed) -->
+  <div class="bg-white/70 dark:bg-slate-900/50 border-y border-amber-200/70 dark:border-slate-800/80 py-4 px-4 mt-10 backdrop-blur-md">
     <div class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-3 overflow-x-auto no-scrollbar">
-      <button onclick="filterCategory('all')" id="btn-all" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">All</button>
-      <button onclick="filterCategory('series')" id="btn-series" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Series</button>
-      <button onclick="filterCategory('anime')" id="btn-anime" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Anime</button>
-      <button onclick="filterCategory('premium')" id="btn-premium" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5"><i class="fa-solid fa-crown"></i>Premium VIP</button>
+      <button onclick="quickFilter('all')" id="btn-all" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">All</button>
+      <button onclick="quickFilter('movie')" id="btn-movie" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Movies</button>
+      <button onclick="quickFilter('series')" id="btn-series" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Series</button>
+      <button onclick="quickFilter('premium')" id="btn-premium" class="menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5"><i class="fa-solid fa-crown"></i>Premium VIP</button>
     </div>
   </div>
 
@@ -144,7 +158,6 @@
       <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-800">
         <iframe id="videoPlayer" class="w-full h-full" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
-      <p id="basicPlanNotice" class="hidden text-xs text-amber-400 mt-4 font-medium"><i class="fa-solid fa-lock mr-1"></i>Downloads disabled on Basic Plan.</p>
     </div>
   </div>
 
@@ -188,7 +201,7 @@
     </div>
   </div>
 
-  <!-- Manual Upload Modal (Admin Only) -->
+  <!-- Manual Upload Modal (Admin Only - Anime removed from category dropdown) -->
   <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl my-8">
       <div class="flex items-center justify-between mb-1">
@@ -202,7 +215,6 @@
             <select id="mCategory" onchange="toggleEpisodeFields()" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
               <option value="Action">Movie</option>
               <option value="Series">Series</option>
-              <option value="Anime">Anime</option>
             </select>
           </div>
           <div>
@@ -216,7 +228,7 @@
 
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 mb-1">Title *</label>
-          <input type="text" id="mTitle" placeholder="e.g. Leo / Solo Leveling" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+          <input type="text" id="mTitle" placeholder="e.g. Leo / Jailer" required class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
         </div>
         
         <div id="episodeFields" class="hidden grid grid-cols-3 gap-3 bg-amber-500/5 p-3 rounded-2xl border border-amber-500/20">
@@ -311,7 +323,6 @@
           <select id="reqCategory" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
             <option value="Movie">Movie</option>
             <option value="Series">Series</option>
-            <option value="Anime">Anime</option>
           </select>
           <input type="text" id="reqLanguage" placeholder="Language" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
         </div>
@@ -328,16 +339,22 @@
     </div>
   </div>
 
+  <!-- Footer Branding Rights -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-8 border-t border-amber-200/40 dark:border-slate-800 text-center text-xs text-slate-500">
+    <p class="font-bold tracking-wide uppercase text-amber-600 dark:text-amber-500 mb-1">HKM PROVIDERS &trade; — ALL RIGHTS RESERVED</p>
+    <p>Designed & Engineered for Premium Cinematic Streaming. Unauthorized distribution or copying of UI assets, credentials, or backend architecture is strictly prohibited.</p>
+  </footer>
+
   <script>
     const API_BASE = "https://misty-chelsy-mahaan-c83f919b.apps.mistral.run/api";
     const MONETAG_AD_URL = "https://your-monetag-ad-link.com";
 
     let currentUserTier = localStorage.getItem('hkm_user_tier') || 'free'; 
-    let moviesData = [], currentFilter = 'all';
+    let moviesData = [];
     let currentSlide = 0, slideInterval;
     let activeShow = null, activeSeason = 1;
+    let activeQuickTab = 'all';
 
-    // Check admin status on page load to reveal/hide Add Content button
     function checkAdminSession() {
       const isAdmin = localStorage.getItem('hkm_admin_auth') === 'true';
       const adminBtn = document.getElementById('adminMenuBtn');
@@ -346,10 +363,9 @@
       }
     }
 
-    // Run in console via adminLogin() to unlock content addition
     function adminLogin() {
       const password = prompt("Enter Admin Password:");
-      if (password === "HKMAdmin123") { // Change this to your secure password
+      if (password === "HKMAdmin123") {
         localStorage.setItem('hkm_admin_auth', 'true');
         checkAdminSession();
         alert("Admin access granted! 'Add Content' is now visible in your menu.");
@@ -389,7 +405,7 @@
     function toggleEpisodeFields() {
       const cat = document.getElementById('mCategory').value;
       const epBox = document.getElementById('episodeFields');
-      if (cat === 'Series' || cat === 'Anime') epBox.classList.remove('hidden');
+      if (cat === 'Series') epBox.classList.remove('hidden');
       else epBox.classList.add('hidden');
     }
 
@@ -401,7 +417,7 @@
       checkAdminSession();
       renderBannerSlideshow();
       renderTop5();
-      renderMovies(currentFilter);
+      advancedSearchWithSpellCheck();
 
       const watchId = new URLSearchParams(window.location.search).get('watch');
       if (watchId) openItem(watchId);
@@ -442,25 +458,114 @@
       `).join('');
     }
 
-    function filterCategory(cat) {
-      currentFilter = cat;
-      document.querySelectorAll('.menu-tab').forEach(b => b.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300");
-      document.getElementById(`btn-${cat}`).className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950";
-      renderMovies(cat);
+    function quickFilter(tab) {
+      activeQuickTab = tab;
+      document.querySelectorAll('.menu-tab').forEach(b => {
+        if (b.id === 'btn-premium') {
+          b.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5";
+        } else {
+          b.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
+        }
+      });
+      const activeBtn = document.getElementById(`btn-${tab}`);
+      if (activeBtn) {
+        activeBtn.className = "menu-tab px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition flex items-center gap-1.5";
+      }
+      advancedSearchWithSpellCheck();
     }
 
-    function renderMovies(filter) {
+    function getLevenshteinDistance(a, b) {
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+      for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    function advancedSearchWithSpellCheck() {
+      const rawQuery = document.getElementById('advSearchInput').value.toLowerCase().trim();
+      const feedbackEl = document.getElementById('spellCheckFeedback');
+      
+      let correctedTerm = '';
+
+      if (rawQuery.length >= 3) {
+        let bestMatch = '';
+        let minDistance = 99;
+        let allowedThreshold = rawQuery.length > 5 ? 2 : 1;
+
+        moviesData.forEach(m => {
+          const words = m.title.toLowerCase().split(/\s+/);
+          words.forEach(w => {
+            const dist = getLevenshteinDistance(rawQuery, w);
+            if (dist < minDistance && dist <= allowedThreshold && w !== rawQuery) {
+              minDistance = dist;
+              bestMatch = w;
+            }
+          });
+        });
+
+        if (bestMatch && minDistance > 0) {
+          correctedTerm = bestMatch;
+          feedbackEl.innerHTML = `Did you mean: <span class="underline cursor-pointer font-bold" onclick="applyCorrection('${bestMatch}')">${bestMatch}</span>?`;
+          feedbackEl.classList.remove('hidden');
+        } else {
+          feedbackEl.classList.add('hidden');
+        }
+      } else {
+        feedbackEl.classList.add('hidden');
+      }
+
+      const filtered = moviesData.filter(m => {
+        const titleLower = m.title.toLowerCase();
+        const creditLower = (m.credit || '').toLowerCase();
+        
+        const matchesQuery = !rawQuery || titleLower.includes(rawQuery) || creditLower.includes(rawQuery) || (correctedTerm && titleLower.includes(correctedTerm));
+        
+        const itemCat = (m.category || '').toLowerCase();
+        const isMovie = itemCat !== 'series';
+
+        let matchesTab = true;
+        if (activeQuickTab === 'movie') matchesTab = isMovie;
+        else if (activeQuickTab === 'series') matchesTab = itemCat === 'series';
+        else if (activeQuickTab === 'premium') matchesTab = Boolean(m.isPremium);
+
+        return matchesQuery && matchesTab;
+      });
+
+      renderMoviesList(filtered);
+    }
+
+    function applyCorrection(term) {
+      document.getElementById('advSearchInput').value = term;
+      document.getElementById('spellCheckFeedback').classList.add('hidden');
+      advancedSearchWithSpellCheck();
+    }
+
+    function resetSearch() {
+      document.getElementById('advSearchInput').value = '';
+      document.getElementById('spellCheckFeedback').classList.add('hidden');
+      quickFilter('all');
+    }
+
+    function renderMoviesList(items) {
       const grid = document.getElementById('movieGrid');
       grid.innerHTML = '';
-      const filtered = moviesData.filter(m => {
-        if (filter === 'series') return m.category?.toLowerCase() === 'series';
-        if (filter === 'anime') return m.category?.toLowerCase() === 'anime';
-        if (filter === 'premium') return m.isPremium;
-        return true;
-      });
-      document.getElementById('movieCount').innerText = `${filtered.length} Items`;
+      document.getElementById('movieCount').innerText = `${items.length} Items`;
 
-      filtered.forEach(m => {
+      if (items.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">No content matches your search query.</div>`;
+        return;
+      }
+
+      items.forEach(m => {
         const hasEps = m.episodes && m.episodes.length > 0;
         grid.innerHTML += `
           <div onclick="openItem('${m._id}')" class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 cursor-pointer flex flex-col justify-between group">
@@ -591,7 +696,7 @@
         credit: document.getElementById('mCredit').value,
         isPremium: document.getElementById('mPremium').value === 'true'
       };
-      if (['Series', 'Anime'].includes(category)) {
+      if (category === 'Series') {
         body.season = Number(document.getElementById('mSeason').value) || 1;
         body.episode = Number(document.getElementById('mEpisode').value) || 1;
         body.episodeTitle = document.getElementById('mEpisodeTitle').value || `Episode ${body.episode}`;
