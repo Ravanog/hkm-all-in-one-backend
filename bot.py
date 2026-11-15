@@ -266,8 +266,8 @@ async def user_submissions(client, message: Message):
                 InlineKeyboardButton("❌ Reject", callback_data=f"rej_{user.id}")
             ],
             [
-                InlineKeyboardButton("⚡ Approve (Basic ₹49)", callback_data=f"app_{user.id}_basic"),
-                InlineKeyboardButton("👑 Approve (Diamond ₹299)", callback_data=f"app_{user.id}_diamond")
+                InlineKeyboardButton("⚡ (Basic ₹49)", callback_data=f"app_{user.id}_basic"),
+                InlineKeyboardButton("👑 (Diamond ₹299)", callback_data=f"app_{user.id}_diamond")
             ]
         ])
 
